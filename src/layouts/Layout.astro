@@ -14,6 +14,12 @@ import "@fontsource/space-mono/400.css";
 import "@fontsource/space-mono/700.css";
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
+// URLs (con hash) de las fuentes above-the-fold, para precargarlas y acelerar
+// FCP/LCP: así `document.fonts.ready` resuelve antes y la entrada CRT arranca antes.
+import antonWoff2 from "@fontsource/anton/files/anton-latin-400-normal.woff2?url";
+import bytesizedWoff2 from "@fontsource/bytesized/files/bytesized-latin-400-normal.woff2?url";
+import spaceMonoWoff2 from "@fontsource/space-mono/files/space-mono-latin-400-normal.woff2?url";
+import jetbrainsWoff2 from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url";
 
 interface Props {
 	title?: string;
@@ -50,6 +56,10 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="preload" href={antonWoff2} as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={bytesizedWoff2} as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={spaceMonoWoff2} as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={jetbrainsWoff2} as="font" type="font/woff2" crossorigin />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
