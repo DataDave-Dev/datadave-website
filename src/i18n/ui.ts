@@ -18,6 +18,9 @@ export const ui = {
         "hero.hint": "[ sobre mí · stack · proyectos ]",
         "hero.stackAria": "Stack principal",
 
+        // ---- Telemetría (pie CRT, compartido) ----
+        "telemetry.onAir": "EN EMISIÓN DESDE 2022",
+
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — SOBRE MÍ",
         "about.leadKicker": "PERFIL / DATADAVE",
@@ -116,6 +119,9 @@ export const ui = {
         "hero.cta": "VIEW PROFILE →",
         "hero.hint": "[ about · stack · projects ]",
         "hero.stackAria": "Core stack",
+
+        // ---- Telemetry (CRT footer, shared) ----
+        "telemetry.onAir": "ON AIR SINCE 2022",
 
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — ABOUT ME",

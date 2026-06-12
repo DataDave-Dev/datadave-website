@@ -1,11 +1,15 @@
 ---
 // Pie tipo telemetría analógica (decorativo).
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <footer class="telemetry about-reveal" aria-hidden="true">
     <span>SIGNAL ▰▰▰▰▰▰▱</span>
     <span>NTSC · 60Hz</span>
-    <span>ON AIR SINCE 2022</span>
+    <span>{t("telemetry.onAir")}</span>
 </footer>
 
 <style>
