@@ -1,0 +1,434 @@
+---
+import Button from "../ui/Button.astro";
+import LanguageToggle from "../ui/LanguageToggle.astro";
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const headline = "DataDave";
+const letters = headline.split("");
+
+// EDITA: tu stack real, en orden de relevancia
+const stack = [
+    "TypeScript",
+    "Python",
+    "Node",
+    "React",
+    "Astro",
+    "SQL",
+];
+---
+
+<section id="hero" class="crt" aria-labelledby="hero-title">
+    <!-- Capas de atmósfera analógica (decorativas) -->
+    <div class="crt__grain" aria-hidden="true"></div>
+    <div class="crt__scanlines" aria-hidden="true"></div>
+    <div class="crt__beam" aria-hidden="true"></div>
+    <div class="crt__vignette" aria-hidden="true"></div>
+
+    <div class="crt__frame">
+        <!-- Lectura de sistema superior -->
+        <header class="readout">
+            <span class="readout__sys"
+                >// SYS.READY<span class="caret" aria-hidden="true">▌</span
+                ></span
+            >
+            <span class="readout__right">
+                <LanguageToggle />
+                <span class="readout__rec">
+                    <span class="rec-dot" aria-hidden="true"></span>REC&nbsp;
+                    00:42:17
+                </span>
+            </span>
+        </header>
+
+        <!-- Núcleo -->
+        <div class="core">
+            <p class="kicker">{t("hero.kicker")}</p>
+
+            <h1 id="hero-title" class="retro-word" aria-label={headline}>
+                {
+                    letters.map((ch, i) => (
+                        <span
+                            class="retro-letter"
+                            data-text={ch}
+                            style={`--i:${i}`}
+                            aria-hidden="true"
+                        >
+                            {ch}
+                        </span>
+                    ))
+                }
+            </h1>
+
+            <p class="subhead">
+                <span class="prompt" aria-hidden="true">&gt;</span>
+                {t("hero.subhead")}
+            </p>
+
+            <div class="actions">
+                <Button
+                    link={localizePath("/about", lang)}
+                    id="enter-cta"
+                    class="cta">{t("hero.cta")}</Button
+                >
+                <span class="actions__hint" aria-hidden="true"
+                    >{t("hero.hint")}</span
+                >
+            </div>
+
+            <!-- Tira de stack (Tailwind) -->
+            <ul
+                class="stack-strip mt-2 flex flex-wrap gap-x-3 gap-y-2 font-mono text-[0.7rem] tracking-[0.15em] uppercase text-dim sm:text-xs"
+                aria-label={t("hero.stackAria")}
+            >
+                {
+                    stack.map((tech) => (
+                        <li class="border border-[#242424] px-2.5 py-1 text-bone/85 transition-colors duration-300 hover:border-salmon hover:text-salmon">
+                            {tech}
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+
+        <!-- Metadatos inferiores tipo telemetría -->
+        <footer class="telemetry" aria-hidden="true">
+            <span>SIGNAL ▰▰▰▰▰▱▱</span>
+            <span>NTSC · 60Hz</span>
+            <span>ON AIR SINCE 2022</span>
+        </footer>
+    </div>
+
+    <!-- Capas de transición CRT (apagado de tubo) -->
+    <div id="fx-black" class="fx fx--black" aria-hidden="true"></div>
+    <div id="fx-line" class="fx fx--line" aria-hidden="true"></div>
+</section>
+
+<style>
+    .crt {
+        position: relative;
+        isolation: isolate;
+        min-height: 100svh;
+        width: 100%;
+        background: transparent;
+        color: var(--c-bone);
+        overflow: hidden;
+    }
+
+    /* ---------- Marco de contenido ---------- */
+    .crt__frame {
+        position: relative;
+        z-index: 4;
+        min-height: 100svh;
+        max-width: 72rem;
+        margin-inline: auto;
+        padding: clamp(1.25rem, 1rem + 2vw, 3rem)
+            clamp(1.25rem, 1rem + 4vw, 4rem);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    }
+
+    /* ---------- Lectura de sistema ---------- */
+    .readout {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        font-family: var(--font-mono);
+        font-size: clamp(0.65rem, 0.6rem + 0.3vw, 0.8rem);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+    }
+
+    .readout__sys {
+        color: var(--c-salmon);
+    }
+
+    .caret {
+        display: inline-block;
+        margin-left: 0.15em;
+        color: var(--c-red);
+    }
+
+    .readout__right {
+        display: inline-flex;
+        align-items: center;
+        gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    }
+
+    .readout__rec {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+        color: var(--c-bone);
+    }
+
+    .rec-dot {
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 50%;
+        background: var(--c-red);
+        box-shadow: 0 0 0.6em var(--c-red);
+    }
+
+    /* ---------- Núcleo ---------- */
+    .core {
+        align-self: center;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(1rem, 0.75rem + 1.5vw, 1.75rem);
+    }
+
+    /* La entrada la anima GSAP (runHeroEntrance en Layout). Con JS, el texto del
+       hero arranca oculto y la timeline lo revela junto; sin JS se ve directo. */
+    :global(html.js) .readout,
+    :global(html.js) .core,
+    :global(html.js) .telemetry {
+        opacity: 0;
+    }
+
+    .kicker {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: clamp(0.7rem, 0.65rem + 0.3vw, 0.85rem);
+        font-weight: 500;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        border-left: 3px solid var(--c-blood);
+        padding-left: 0.9em;
+    }
+
+    /* ---------- Titular pixel-art CRT + lava ---------- */
+    .retro-word {
+        display: inline-flex;
+        margin: 0;
+        font-family: var(--font-pixel);
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        font-size: clamp(2.4rem, 1rem + 10.5vw, 8.5rem);
+        /* Profundidad para el flip 3D de las letras en la entrada y el
+           magnetismo hacia el cursor (los maneja GSAP en Layout). */
+        perspective: 700px;
+        /* Bloom de fósforo rojo (CRT), no contorno blanco. El movimiento lo
+           aporta la lava: el titular en sí queda quieto y suave. */
+        filter: drop-shadow(0 0 0.11em rgba(255, 38, 0, 0.42));
+    }
+
+    .retro-letter {
+        position: relative;
+        display: inline-block;
+        color: transparent;
+        /* Desplazamiento de la lava: lo anima GSAP (startAtmosphere). */
+        --boil-x: 0px;
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+
+    /* Capa trasera: extrusión 3D en rojo sangre (bloque 8-bit on-palette) */
+    .retro-letter::before {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 5;
+        color: #190000;
+        -webkit-text-stroke: 0.014em #000;
+        text-shadow:
+            0.02em 0.02em 0 #5a0000,
+            0.04em 0.04em 0 #3a0000,
+            0.06em 0.06em 0 #220000,
+            0.08em 0.08em 0.01em rgba(0, 0, 0, 0.55);
+    }
+
+    /* Capa frontal: lava hirviendo + scanlines CRT, clipeadas al texto */
+    .retro-letter::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        color: transparent;
+        background:
+            repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.5) 0,
+                rgba(0, 0, 0, 0.5) 0.035em,
+                transparent 0.035em,
+                transparent 0.085em
+            ),
+            url("/images/retro-boil.svg") 0 0 / auto 150% repeat-x,
+            linear-gradient(
+                180deg,
+                #ff8a1e 0%,
+                #ff2a00 42%,
+                #990000 74%,
+                #5a0000 100%
+            );
+        /* La capa de lava (2ª) se desplaza vía --boil-x (GSAP); el resto fijo. */
+        background-position: 0 0, var(--boil-x) 0, 0 0;
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+
+    /* ---------- Subhead ---------- */
+    .subhead {
+        margin: 0;
+        max-width: 48ch;
+        font-family: var(--font-body);
+        font-size: clamp(1rem, 0.92rem + 0.45vw, 1.3rem);
+        line-height: 1.6;
+        color: #ddd6d0;
+    }
+
+    .prompt {
+        color: var(--c-red);
+        margin-right: 0.4em;
+        font-weight: 700;
+    }
+
+    /* ---------- Acciones ---------- */
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+
+    .cta {
+        font-family: var(--font-mono);
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        font-size: 0.95rem;
+    }
+
+    .actions__hint {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+    }
+
+    /* ---------- Telemetría ---------- */
+    .telemetry {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: clamp(0.6rem, 0.58rem + 0.2vw, 0.72rem);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        border-top: 1px solid #1a1a1a;
+        padding-top: 1rem;
+    }
+    .telemetry span:first-child {
+        color: var(--c-blood);
+    }
+
+    /* ============================================================
+       Capas CRT
+       ============================================================ */
+    .crt__scanlines {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0) 0,
+            rgba(0, 0, 0, 0) 2px,
+            rgba(0, 0, 0, 0.16) 3px,
+            rgba(0, 0, 0, 0.16) 4px
+        );
+        mix-blend-mode: multiply;
+    }
+
+    .crt__vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        background:
+            radial-gradient(
+                120% 100% at 50% 50%,
+                rgba(153, 0, 0, 0.1) 0%,
+                rgba(8, 8, 8, 0) 40%,
+                rgba(8, 8, 8, 0.85) 100%
+            ),
+            radial-gradient(
+                100% 60% at 50% 0%,
+                rgba(255, 0, 0, 0.06),
+                transparent 60%
+            );
+    }
+
+    .crt__beam {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 28%;
+        z-index: 6;
+        pointer-events: none;
+        background: linear-gradient(
+            to bottom,
+            transparent,
+            rgba(255, 255, 255, 0.035) 60%,
+            rgba(255, 0, 0, 0.05) 100%
+        );
+    }
+
+    .crt__grain {
+        position: absolute;
+        inset: -50%;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.5;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Toda la animación (lava, haz, grano, latido, parpadeo, entrada y vida de
+       las letras) la dirige GSAP desde Layout. Aquí no hay @keyframes. */
+
+    /* ---------- Capas de transición (apagado CRT) ---------- */
+    .fx {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        will-change: transform, opacity;
+    }
+    .fx--black {
+        z-index: 90;
+        background: #050505;
+    }
+    .fx--line {
+        z-index: 91;
+        background: #fff;
+        transform-origin: center center;
+    }
+
+    /* ============================================================
+       Accesibilidad: respeta reduce-motion
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+        /* GSAP no arranca: el hero se ve directo y quieto. */
+        :global(html.js) .readout,
+        :global(html.js) .core,
+        :global(html.js) .telemetry {
+            opacity: 1;
+        }
+        .retro-letter {
+            transform: none;
+        }
+    }
+</style>

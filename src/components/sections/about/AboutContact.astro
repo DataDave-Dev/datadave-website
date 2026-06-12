@@ -1,0 +1,49 @@
+---
+import { CONTACT } from "@/const/profile";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section
+    id="contacto"
+    class="scroll-mt-24 about-reveal border border-[#1c1c1c] bg-linear-to-br from-[rgba(153,0,0,0.08)] to-transparent p-8 md:p-12"
+    aria-labelledby="contacto-title"
+>
+    <h2
+        class="mb-3 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-ember"
+        id="contacto-title"
+    >
+        {t("about.contactLabel")}
+    </h2>
+
+    <p
+        class="mb-8 max-w-[40ch] font-display text-3xl uppercase leading-[0.95] text-bone md:text-5xl"
+    >
+        {t("about.contactHead1")}<br />{t("about.contactHead2")}
+    </p>
+
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-4 font-mono text-sm">
+        <a
+            href={`mailto:${CONTACT.email}`}
+            class="inline-flex items-center gap-2 border border-salmon px-5 py-2 uppercase tracking-[0.2em] text-salmon transition-colors duration-300 hover:bg-salmon hover:text-bg"
+        >
+            <span aria-hidden="true">&gt;</span> {t("about.contactWrite")}
+        </a>
+        <a
+            href={CONTACT.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="uppercase tracking-[0.15em] text-dim transition-colors duration-200 hover:text-salmon"
+            >GitHub↗</a
+        >
+        <a
+            href={CONTACT.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="uppercase tracking-[0.15em] text-dim transition-colors duration-200 hover:text-salmon"
+            >LinkedIn↗</a
+        >
+    </div>
+</section>

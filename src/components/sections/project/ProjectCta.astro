@@ -1,0 +1,31 @@
+---
+// Cierre de la página de detalle: vuelve al listado o salta a contacto.
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section
+    class="border border-[#1c1c1c] bg-linear-to-br from-[rgba(153,0,0,0.08)] to-transparent p-8 md:p-12"
+>
+    <p
+        class="mb-6 max-w-[28ch] font-display text-3xl uppercase leading-[0.95] text-bone md:text-4xl"
+    >
+        {t("cta.head1")}<br />{t("cta.head2")}
+    </p>
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-4 font-mono text-sm">
+        <a
+            href={`${localizePath("/about", lang)}#contacto`}
+            class="inline-flex items-center gap-2 border border-salmon px-5 py-2 uppercase tracking-[0.2em] text-salmon transition-colors duration-300 hover:bg-salmon hover:text-bg"
+        >
+            <span aria-hidden="true">&gt;</span> {t("cta.talk")}
+        </a>
+        <a
+            href={localizePath("/about", lang)}
+            class="uppercase tracking-[0.15em] text-dim transition-colors duration-200 hover:text-salmon"
+        >
+            {t("cta.backAbout")}
+        </a>
+    </div>
+</section>

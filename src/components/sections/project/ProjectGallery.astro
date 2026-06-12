@@ -1,0 +1,769 @@
+---
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import type { ProjectImage } from "@/const/projects";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+    gallery: ProjectImage[];
+}
+const { gallery } = Astro.props;
+const total = String(gallery.length).padStart(2, "0");
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<section aria-labelledby="gallery-title">
+    <SectionLabel id="gallery-title">{t("project.galleryLabel")}</SectionLabel>
+
+    <div
+        class="gallery"
+        data-gallery
+        role="group"
+        aria-roledescription={t("gallery.carousel")}
+        aria-label={t("gallery.groupAria")}
+    >
+        <!-- Escenario coverflow 3D -->
+        <div class="stage" data-stage tabindex="-1">
+            <div class="ambient" data-ambient aria-hidden="true"></div>
+
+            <div class="track">
+                {
+                    gallery.map((img, i) => (
+                        <button
+                            type="button"
+                            class="slide"
+                            data-slide
+                            data-index={i}
+                            aria-label={t("gallery.slideAria", {
+                                n: i + 1,
+                                total: gallery.length,
+                                alt: img.alt,
+                            })}
+                        >
+                            <img
+                                src={img.src}
+                                alt={img.alt}
+                                width="1920"
+                                height="1080"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="slide__sheen" aria-hidden="true" />
+                            <span class="slide__zoom" aria-hidden="true">
+                                {t("gallery.zoom")}
+                            </span>
+                        </button>
+                    ))
+                }
+            </div>
+
+            <div class="edge edge--l" aria-hidden="true"></div>
+            <div class="edge edge--r" aria-hidden="true"></div>
+
+            <button
+                type="button"
+                class="nav nav--prev"
+                data-prev
+                aria-label={t("gallery.prev")}
+            >
+                <span aria-hidden="true">‹</span>
+            </button>
+            <button
+                type="button"
+                class="nav nav--next"
+                data-next
+                aria-label={t("gallery.next")}
+            >
+                <span aria-hidden="true">›</span>
+            </button>
+        </div>
+
+        <!-- Controles inferiores -->
+        <div class="hud">
+            <div class="dots" role="tablist" aria-label={t("gallery.dotsAria")}>
+                {
+                    gallery.map((img, i) => (
+                        <button
+                            type="button"
+                            class="dot"
+                            data-dot
+                            data-index={i}
+                            role="tab"
+                            aria-label={t("gallery.dotAria", {
+                                n: i + 1,
+                                alt: img.alt,
+                            })}
+                        />
+                    ))
+                }
+            </div>
+            <p class="counter" aria-hidden="true">
+                <span class="counter__num" data-current>01</span>
+                <span class="counter__sep">/</span>
+                <span class="counter__total">{total}</span>
+            </p>
+        </div>
+
+        <!-- Lightbox -->
+        <div
+            class="lightbox"
+            data-lightbox
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("gallery.lightboxAria")}
+            hidden
+        >
+            <div class="lightbox__scan" aria-hidden="true"></div>
+            <button
+                type="button"
+                class="lb-close"
+                data-close
+                aria-label={t("gallery.close")}
+            >
+                <span aria-hidden="true">×</span>
+            </button>
+            <button
+                type="button"
+                class="lb-nav lb-nav--prev"
+                data-lb-prev
+                aria-label={t("gallery.prev")}
+            >
+                <span aria-hidden="true">‹</span>
+            </button>
+            <figure class="lb-figure">
+                <img data-lb-img src="" alt="" />
+                <figcaption class="lb-caption">
+                    <span class="lb-caption__num" data-lb-counter></span>
+                    <span class="lb-caption__alt" data-lb-alt></span>
+                </figcaption>
+            </figure>
+            <button
+                type="button"
+                class="lb-nav lb-nav--next"
+                data-lb-next
+                aria-label={t("gallery.next")}
+            >
+                <span aria-hidden="true">›</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<style>
+    .gallery {
+        position: relative;
+        isolation: isolate;
+    }
+
+    /* ---------- Escenario coverflow 3D ---------- */
+    .stage {
+        position: relative;
+        height: clamp(190px, 38vw, 400px);
+        outline: none;
+    }
+    .track {
+        position: absolute;
+        inset: 0;
+        /* Difumina los laterales hacia los bordes y recorta lo que sobresale. */
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            #000 13%,
+            #000 87%,
+            transparent 100%
+        );
+        mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            #000 13%,
+            #000 87%,
+            transparent 100%
+        );
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+    }
+
+    /* Backlight: copia difuminada de la imagen central */
+    /* Backlight desactivado: enturbiaba las capturas. */
+    .ambient {
+        display: none;
+    }
+
+    .slide {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        height: 94%;
+        aspect-ratio: 16 / 9;
+        margin: 0;
+        padding: 0;
+        border: 1px solid #242424;
+        background: #0d0d0d;
+        cursor: pointer;
+        overflow: hidden;
+        transform: translate(-50%, -50%);
+        transform-origin: center;
+        backface-visibility: hidden;
+        will-change: transform, opacity, filter;
+        /* easing con sobre-impulso (sensación de resorte) */
+        transition:
+            transform 0.62s cubic-bezier(0.34, 1.3, 0.5, 1),
+            opacity 0.5s ease,
+            filter 0.5s ease,
+            border-color 0.35s ease,
+            box-shadow 0.45s ease;
+    }
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
+    }
+
+    /* Capturas de UI: totalmente nítidas, sin ningún velo encima. */
+    .slide__sheen {
+        display: none;
+    }
+
+    .slide__zoom {
+        position: absolute;
+        bottom: 0.6rem;
+        right: 0.6rem;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--c-bone);
+        background: rgba(8, 8, 8, 0.72);
+        border: 1px solid rgba(255, 74, 50, 0.55);
+        padding: 0.3em 0.6em;
+        opacity: 0;
+        transform: translateY(0.4em);
+        transition:
+            opacity 0.3s ease,
+            transform 0.3s var(--ease-out-expo);
+        pointer-events: none;
+    }
+    .slide.is-active {
+        border-color: rgba(255, 74, 50, 0.7);
+        box-shadow:
+            0 0 0 1px rgba(255, 74, 50, 0.25),
+            0 22px 55px -24px rgba(0, 0, 0, 0.9),
+            0 0 40px -18px rgba(255, 74, 50, 0.35);
+    }
+    .slide.is-active .slide__sheen {
+        box-shadow: none; /* la protagonista, totalmente nítida */
+    }
+    .slide.is-active:hover .slide__zoom,
+    .slide.is-active:focus-visible .slide__zoom {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .slide:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 4px;
+    }
+
+    /* Degradados laterales: las imágenes de los lados se funden con el fondo */
+    /* Los bordes ahora se difuminan con la máscara de .track */
+    .edge {
+        display: none;
+    }
+
+    /* ---------- Flechas ---------- */
+    .nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 30;
+        width: 2.75rem;
+        height: 2.75rem;
+        display: grid;
+        place-items: center;
+        border: 1px solid #2a2a2a;
+        background: rgba(8, 8, 8, 0.72);
+        color: var(--c-bone);
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        backdrop-filter: blur(4px);
+        transition:
+            color 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease,
+            transform 0.25s var(--ease-out-expo);
+    }
+    .nav:hover,
+    .nav:focus-visible {
+        color: var(--c-bg);
+        background: var(--c-salmon);
+        border-color: var(--c-salmon);
+    }
+    .nav:active {
+        transform: translateY(-50%) scale(0.92);
+    }
+    .nav:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 2px;
+    }
+    .nav--prev {
+        left: clamp(0.25rem, 2vw, 1rem);
+    }
+    .nav--next {
+        right: clamp(0.25rem, 2vw, 1rem);
+    }
+
+    /* ---------- HUD: puntos + contador ---------- */
+    .hud {
+        margin-top: 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .dots {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+    }
+    .dot {
+        position: relative;
+        width: 0.55rem;
+        height: 0.55rem;
+        padding: 0;
+        border: 1px solid #3a3a3a;
+        background: transparent;
+        cursor: pointer;
+        transition:
+            width 0.45s cubic-bezier(0.34, 1.3, 0.5, 1),
+            background 0.3s ease,
+            border-color 0.3s ease;
+    }
+    .dot:hover {
+        border-color: var(--c-salmon);
+    }
+    .dot:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 2px;
+    }
+    .dot.is-on {
+        width: 1.75rem;
+        background: var(--c-ember);
+        border-color: var(--c-ember);
+        box-shadow: 0 0 12px -2px rgba(255, 74, 50, 0.7);
+    }
+    .counter {
+        margin: 0;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4em;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        letter-spacing: 0.18em;
+        color: var(--c-dim);
+        font-variant-numeric: tabular-nums;
+    }
+    .counter__num {
+        color: var(--c-salmon);
+        display: inline-block;
+        min-width: 1.5em;
+        text-align: right;
+    }
+    .counter__num.is-bump {
+        animation: num-bump 0.4s var(--ease-out-expo);
+    }
+    @keyframes num-bump {
+        0% {
+            opacity: 0.3;
+            transform: translateY(-0.25em);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ---------- Lightbox ---------- */
+    .lightbox {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: clamp(0.5rem, 2vw, 1.5rem);
+        padding: clamp(1rem, 4vw, 3rem);
+        background: rgba(6, 6, 6, 0.93);
+        backdrop-filter: blur(10px);
+        animation: lb-in 0.32s ease both;
+    }
+    .lightbox[hidden] {
+        display: none;
+    }
+    @keyframes lb-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    .lightbox__scan {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            0deg,
+            rgba(0, 0, 0, 0) 0,
+            rgba(0, 0, 0, 0) 2px,
+            rgba(0, 0, 0, 0.14) 3px,
+            rgba(0, 0, 0, 0.14) 4px
+        );
+        mix-blend-mode: multiply;
+    }
+    .lb-figure {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+    }
+    .lb-figure img {
+        max-width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+        border: 1px solid rgba(255, 74, 50, 0.35);
+        background: #0d0d0d;
+        box-shadow:
+            0 30px 90px -20px rgba(0, 0, 0, 0.95),
+            0 0 90px -30px rgba(255, 74, 50, 0.4);
+        animation: lb-zoom 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes lb-zoom {
+        from {
+            opacity: 0;
+            transform: scale(0.92) translateY(0.6rem);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    .lb-caption {
+        display: flex;
+        gap: 1rem;
+        align-items: baseline;
+        max-width: 72ch;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        line-height: 1.55;
+    }
+    .lb-caption__num {
+        color: var(--c-ember);
+        font-variant-numeric: tabular-nums;
+        flex-shrink: 0;
+        letter-spacing: 0.15em;
+    }
+    .lb-caption__alt {
+        color: #cfc9c4;
+        font-family: var(--font-body);
+        text-align: left;
+    }
+    .lb-close {
+        position: absolute;
+        z-index: 2;
+        top: clamp(0.75rem, 3vw, 1.5rem);
+        right: clamp(0.75rem, 3vw, 1.5rem);
+        width: 2.75rem;
+        height: 2.75rem;
+        display: grid;
+        place-items: center;
+        border: 1px solid #2a2a2a;
+        background: rgba(8, 8, 8, 0.7);
+        color: var(--c-bone);
+        font-size: 1.6rem;
+        line-height: 1;
+        cursor: pointer;
+        transition:
+            color 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease,
+            transform 0.2s var(--ease-out-expo);
+    }
+    .lb-nav {
+        position: relative;
+        z-index: 1;
+        width: 3rem;
+        height: 3rem;
+        display: grid;
+        place-items: center;
+        border: 1px solid #2a2a2a;
+        background: rgba(8, 8, 8, 0.7);
+        color: var(--c-bone);
+        font-size: 1.7rem;
+        line-height: 1;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition:
+            color 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease,
+            transform 0.2s var(--ease-out-expo);
+    }
+    .lb-close:hover,
+    .lb-close:focus-visible,
+    .lb-nav:hover,
+    .lb-nav:focus-visible {
+        color: var(--c-bg);
+        background: var(--c-salmon);
+        border-color: var(--c-salmon);
+    }
+    .lb-close:active,
+    .lb-nav:active {
+        transform: scale(0.92);
+    }
+    .lb-close:focus-visible,
+    .lb-nav:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 2px;
+    }
+
+    /* ---------- Reduce-motion ---------- */
+    @media (prefers-reduced-motion: reduce) {
+        .slide,
+        .slide__zoom,
+        .dot,
+        .ambient,
+        .nav,
+        .lightbox,
+        .lb-figure img,
+        .counter__num {
+            transition: none;
+            animation: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .lb-caption__alt {
+            display: none;
+        }
+        .lb-nav {
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+    }
+</style>
+
+<script>
+    interface SlideTransform {
+        x: number;
+        z: number;
+        ry: number;
+        s: number;
+        o: number;
+        b: number;
+        br: number;
+    }
+
+    function slideTransform(off: number): SlideTransform {
+        const abs = Math.abs(off);
+        if (off === 0) return { x: 0, z: 0, ry: 0, s: 1, o: 1, b: 0, br: 1 };
+        if (abs === 1)
+            return { x: off * 90, z: 0, ry: 0, s: 0.7, o: 0.45, b: 0, br: 0.65 };
+        return { x: off * 132, z: 0, ry: 0, s: 0.6, o: 0, b: 0, br: 0.5 };
+    }
+
+    function setupGallery(root: HTMLElement): void {
+        if (root.dataset.ready) return;
+        root.dataset.ready = "1";
+
+        const slides = Array.from(
+            root.querySelectorAll<HTMLButtonElement>("[data-slide]"),
+        );
+        const dots = Array.from(
+            root.querySelectorAll<HTMLButtonElement>("[data-dot]"),
+        );
+        const n = slides.length;
+        if (!n) return;
+
+        const stage = root.querySelector<HTMLElement>("[data-stage]");
+        const ambient = root.querySelector<HTMLElement>("[data-ambient]");
+        const prevBtn = root.querySelector<HTMLButtonElement>("[data-prev]");
+        const nextBtn = root.querySelector<HTMLButtonElement>("[data-next]");
+        const current = root.querySelector<HTMLElement>("[data-current]");
+
+        const lightbox = root.querySelector<HTMLElement>("[data-lightbox]");
+        const lbImg = root.querySelector<HTMLImageElement>("[data-lb-img]");
+        const lbCounter = root.querySelector<HTMLElement>("[data-lb-counter]");
+        const lbAlt = root.querySelector<HTMLElement>("[data-lb-alt]");
+        const closeBtn = root.querySelector<HTMLButtonElement>("[data-close]");
+        const lbPrev = root.querySelector<HTMLButtonElement>("[data-lb-prev]");
+        const lbNext = root.querySelector<HTMLButtonElement>("[data-lb-next]");
+
+        const pad = (i: number) => String(i + 1).padStart(2, "0");
+        const wrap = (i: number) => ((i % n) + n) % n;
+        const srcOf = (i: number) => {
+            const img = slides[i].querySelector("img");
+            return img ? img.currentSrc || img.src : "";
+        };
+
+        let active = 0;
+        let lbIndex = 0;
+        let lastFocus: HTMLElement | null = null;
+
+        function render(): void {
+            slides.forEach((slide, i) => {
+                let off = i - active;
+                if (off > n / 2) off -= n;
+                if (off < -n / 2) off += n;
+                const t = slideTransform(off);
+                slide.style.transform = `translate(-50%, -50%) translateX(${t.x}%) translateZ(${t.z}px) rotateY(${t.ry}deg) scale(${t.s})`;
+                slide.style.opacity = String(t.o);
+                slide.style.filter = `blur(${t.b}px) brightness(${t.br})`;
+                slide.style.zIndex = String(20 - Math.abs(off));
+                slide.style.pointerEvents = Math.abs(off) <= 1 ? "auto" : "none";
+                slide.tabIndex = off === 0 ? 0 : -1;
+                slide.setAttribute(
+                    "aria-hidden",
+                    Math.abs(off) <= 1 ? "false" : "true",
+                );
+                slide.classList.toggle("is-active", off === 0);
+            });
+
+            if (ambient) {
+                const src = srcOf(active);
+                if (src) {
+                    ambient.style.backgroundImage = `url("${src}")`;
+                    ambient.style.opacity = "0.25";
+                }
+            }
+            if (current) {
+                current.textContent = pad(active);
+                current.classList.remove("is-bump");
+                void current.offsetWidth; // reinicia la animación
+                current.classList.add("is-bump");
+            }
+            dots.forEach((dot, i) => {
+                const on = i === active;
+                dot.classList.toggle("is-on", on);
+                dot.setAttribute("aria-selected", on ? "true" : "false");
+                dot.tabIndex = on ? 0 : -1;
+            });
+        }
+
+        function go(dir: number): void {
+            active = wrap(active + dir);
+            render();
+        }
+        function setActive(i: number): void {
+            active = wrap(i);
+            render();
+        }
+
+        // ---- Lightbox ----
+        function setLbImage(): void {
+            const img = slides[lbIndex].querySelector("img");
+            if (!img || !lbImg) return;
+            lbImg.src = img.currentSrc || img.src;
+            lbImg.alt = img.alt;
+            if (lbCounter)
+                lbCounter.textContent = `${pad(lbIndex)} / ${String(n).padStart(2, "0")}`;
+            if (lbAlt) lbAlt.textContent = img.alt;
+        }
+        function openLightbox(i: number): void {
+            if (!lightbox) return;
+            lbIndex = wrap(i);
+            setLbImage();
+            lightbox.hidden = false;
+            document.body.style.overflow = "hidden";
+            lastFocus = document.activeElement as HTMLElement;
+            closeBtn?.focus();
+        }
+        function closeLightbox(): void {
+            if (!lightbox) return;
+            lightbox.hidden = true;
+            document.body.style.overflow = "";
+            setActive(lbIndex);
+            lastFocus?.focus();
+        }
+        function lbGo(dir: number): void {
+            lbIndex = wrap(lbIndex + dir);
+            setLbImage();
+        }
+
+        // ---- Eventos ----
+        prevBtn?.addEventListener("click", () => go(-1));
+        nextBtn?.addEventListener("click", () => go(1));
+
+        slides.forEach((slide, i) => {
+            slide.addEventListener("click", () => {
+                if (i === active) openLightbox(active);
+                else setActive(i);
+            });
+        });
+        dots.forEach((dot, i) =>
+            dot.addEventListener("click", () => setActive(i)),
+        );
+
+        stage?.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                go(-1);
+            } else if (e.key === "ArrowRight") {
+                e.preventDefault();
+                go(1);
+            }
+        });
+
+        closeBtn?.addEventListener("click", closeLightbox);
+        lbPrev?.addEventListener("click", () => lbGo(-1));
+        lbNext?.addEventListener("click", () => lbGo(1));
+        lightbox?.addEventListener("click", (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+        lightbox?.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                closeLightbox();
+            } else if (e.key === "ArrowLeft") {
+                lbGo(-1);
+            } else if (e.key === "ArrowRight") {
+                lbGo(1);
+            } else if (e.key === "Tab") {
+                const focusables = [closeBtn, lbPrev, lbNext].filter(
+                    Boolean,
+                ) as HTMLElement[];
+                if (!focusables.length) return;
+                e.preventDefault();
+                const idx = focusables.indexOf(
+                    document.activeElement as HTMLElement,
+                );
+                const dir = e.shiftKey ? -1 : 1;
+                const next =
+                    focusables[
+                        (idx + dir + focusables.length) % focusables.length
+                    ] ?? focusables[0];
+                next.focus();
+            }
+        });
+
+        render();
+    }
+
+    function initGalleries(): void {
+        document
+            .querySelectorAll<HTMLElement>("[data-gallery]")
+            .forEach(setupGallery);
+    }
+
+    // Inicial + tras cada navegación del ClientRouter
+    document.addEventListener("astro:page-load", initGalleries);
+</script>

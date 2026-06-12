@@ -1,0 +1,76 @@
+---
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import { getTestimonials } from "@/const/testimonials";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const TESTIMONIALS = getTestimonials(lang);
+---
+
+{
+    TESTIMONIALS.length > 0 && (
+        <section class="about-reveal" aria-labelledby="testimonios-title">
+            <SectionLabel id="testimonios-title">
+                {t("about.testimonialsLabel")}
+            </SectionLabel>
+
+            <p class="mb-8 max-w-[34ch] font-display text-3xl uppercase leading-[0.95] text-bone md:text-4xl">
+                {t("about.testimonialsHeadline")}
+            </p>
+
+            <ul class="grid grid-cols-1 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-2">
+                {TESTIMONIALS.map((item) => (
+                    <li class="group flex flex-col gap-5 bg-bg p-6 transition-colors duration-300 hover:bg-[#111] md:p-8">
+                        <span
+                            class="font-display text-5xl leading-[0.5] text-blood"
+                            aria-hidden="true"
+                        >
+                            “
+                        </span>
+
+                        <blockquote class="font-body text-base leading-relaxed text-[#d6cfc9] md:text-lg">
+                            {item.quote}
+                        </blockquote>
+
+                        <footer class="mt-auto flex items-center gap-4 border-t border-[#1c1c1c] pt-4">
+                            {item.avatar && (
+                                <img
+                                    src={item.avatar}
+                                    alt={item.name}
+                                    width="44"
+                                    height="44"
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="h-11 w-11 shrink-0 rounded-full object-cover"
+                                />
+                            )}
+                            <span class="flex flex-col gap-0.5">
+                                <cite class="font-mono text-sm uppercase not-italic tracking-[0.12em] text-salmon">
+                                    {item.name}
+                                </cite>
+                                <span class="font-mono text-[0.72rem] uppercase tracking-[0.1em] text-dim">
+                                    {item.role}
+                                    {item.company ? ` · ${item.company}` : ""}
+                                </span>
+                            </span>
+                            {item.linkedin && (
+                                <a
+                                    href={item.linkedin}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={t("about.testimonialLinkedinAria", {
+                                        name: item.name,
+                                    })}
+                                    class="ml-auto font-mono text-[0.7rem] uppercase tracking-[0.12em] text-dim transition-colors duration-200 hover:text-salmon"
+                                >
+                                    LinkedIn↗
+                                </a>
+                            )}
+                        </footer>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )
+}

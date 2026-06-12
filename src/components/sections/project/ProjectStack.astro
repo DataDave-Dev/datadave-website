@@ -1,0 +1,30 @@
+---
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import type { ProjectStackItem } from "@/const/projects";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+    stack: ProjectStackItem[];
+}
+const { stack } = Astro.props;
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<section aria-labelledby="stack-title">
+    <SectionLabel id="stack-title">{t("project.stackLabel")}</SectionLabel>
+    <dl class="border-t border-[#1c1c1c]">
+        {
+            stack.map((s) => (
+                <div class="grid grid-cols-1 gap-1 border-b border-[#1c1c1c] py-4 md:grid-cols-[200px_1fr] md:gap-6">
+                    <dt class="font-mono text-sm uppercase tracking-[0.12em] text-salmon">
+                        {s.name}
+                    </dt>
+                    <dd class="m-0 max-w-[60ch] font-body text-sm leading-relaxed text-[#cfc9c4]">
+                        {s.why}
+                    </dd>
+                </div>
+            ))
+        }
+    </dl>
+</section>

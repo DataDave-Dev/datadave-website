@@ -1,6 +1,9 @@
 # build output
 dist/
 
+# ai docs
+.claude
+
 # generated types
 .astro/
 

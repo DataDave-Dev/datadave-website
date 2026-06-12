@@ -1,0 +1,387 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Button from "@/components/ui/Button.astro";
+---
+
+<Layout
+    title="404 · Señal perdida / Signal lost · DataDave"
+    description="Canal no encontrado / Channel not found. La página que buscas no existe — the page you're looking for doesn't exist."
+    noindex={true}
+>
+    <main id="e404" class="crt" aria-labelledby="e404-title">
+        <!-- Atmósfera analógica -->
+        <div class="crt__grain" aria-hidden="true"></div>
+        <div class="crt__scanlines" aria-hidden="true"></div>
+        <div class="crt__vignette" aria-hidden="true"></div>
+
+        <div class="frame">
+            <header class="readout">
+                <span class="readout__sys">// SYS.ERROR</span>
+                <span class="readout__rec">
+                    <span class="rec-dot" aria-hidden="true"></span>NO SIGNAL
+                </span>
+            </header>
+
+            <div class="core">
+                <p class="kicker">ERROR · CH 404</p>
+
+                <h1
+                    id="e404-title"
+                    class="glitch"
+                    data-text="404"
+                    aria-label="Error 404 — página no encontrada / page not found"
+                >
+                    404
+                </h1>
+
+                <p class="headline">SEÑAL PERDIDA · SIGNAL LOST</p>
+
+                <p class="lead">
+                    <span class="prompt" aria-hidden="true">&gt;</span>
+                    El canal que buscas no existe o se desvaneció en el ruido.
+                    <br />The channel you're looking for doesn't exist or faded
+                    into the noise.
+                </p>
+
+                <div class="actions">
+                    <Button id="home-cta" link="/es" class="cta"
+                        >← INICIO / HOME</Button
+                    >
+                    <a href="/es" class="actions__alt" hreflang="es">ES</a>
+                    <a href="/en" class="actions__alt" hreflang="en">EN</a>
+                </div>
+            </div>
+
+            <footer class="telemetry" aria-hidden="true">
+                <span>NO SIGNAL ▰▱▱▱▱▱▱</span>
+                <span>NTSC · 60Hz</span>
+                <span>ON AIR SINCE 2022</span>
+            </footer>
+        </div>
+    </main>
+
+    <script is:inline>
+        // El 404 es único para cualquier ruta, así que el botón se ajusta al
+        // idioma del navegador (por defecto /es).
+        (function () {
+            try {
+                var cta = document.getElementById("home-cta");
+                if (!cta) return;
+                var code = String(
+                    (navigator.languages && navigator.languages[0]) ||
+                        navigator.language ||
+                        "",
+                )
+                    .toLowerCase()
+                    .slice(0, 2);
+                cta.setAttribute("href", code === "en" ? "/en" : "/es");
+            } catch (e) {}
+        })();
+    </script>
+</Layout>
+
+<style>
+    .crt {
+        position: relative;
+        isolation: isolate;
+        min-height: 100svh;
+        width: 100%;
+        background: transparent;
+        color: var(--c-bone);
+        overflow: hidden;
+    }
+
+    .frame {
+        position: relative;
+        z-index: 4;
+        min-height: 100svh;
+        max-width: 72rem;
+        margin-inline: auto;
+        padding: clamp(1.25rem, 1rem + 2vw, 3rem) clamp(1.25rem, 1rem + 4vw, 4rem);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    }
+
+    /* ---------- Lectura de sistema ---------- */
+    .readout {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        font-family: var(--font-mono);
+        font-size: clamp(0.65rem, 0.6rem + 0.3vw, 0.8rem);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+    }
+    .readout__sys {
+        color: var(--c-ember);
+    }
+    .readout__rec {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+        color: var(--c-bone);
+    }
+    .rec-dot {
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 50%;
+        background: var(--c-red);
+        box-shadow: 0 0 0.6em var(--c-red);
+        animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    /* ---------- Núcleo ---------- */
+    .core {
+        align-self: center;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.85rem, 0.6rem + 1.5vw, 1.5rem);
+    }
+
+    .kicker {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: clamp(0.7rem, 0.65rem + 0.3vw, 0.85rem);
+        font-weight: 500;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        border-left: 3px solid var(--c-blood);
+        padding-left: 0.9em;
+    }
+
+    /* ---------- 404 con glitch ---------- */
+    .glitch {
+        position: relative;
+        margin: 0;
+        font-family: var(--font-pixel);
+        font-weight: 400;
+        line-height: 0.9;
+        font-size: clamp(5rem, 2rem + 20vw, 16rem);
+        letter-spacing: 0.04em;
+        color: var(--c-bone);
+        text-shadow: 0 0 0.12em rgba(255, 74, 50, 0.35);
+        width: max-content;
+    }
+    .glitch::before,
+    .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+    .glitch::before {
+        color: var(--c-ember);
+        animation: glitch-a 3.2s steps(2, end) infinite;
+    }
+    .glitch::after {
+        color: var(--c-salmon);
+        animation: glitch-b 2.7s steps(2, end) infinite;
+    }
+
+    /* ---------- Titular ---------- */
+    .headline {
+        margin: 0;
+        font-family: var(--font-display);
+        font-weight: 400;
+        line-height: 0.9;
+        font-size: clamp(1.6rem, 1rem + 3vw, 3.25rem);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--c-bone);
+    }
+
+    /* ---------- Subhead ---------- */
+    .lead {
+        margin: 0;
+        max-width: 46ch;
+        font-family: var(--font-body);
+        font-size: clamp(1rem, 0.92rem + 0.45vw, 1.25rem);
+        line-height: 1.6;
+        color: #ddd6d0;
+    }
+    .prompt {
+        color: var(--c-red);
+        margin-right: 0.4em;
+        font-weight: 700;
+    }
+
+    /* ---------- Acciones ---------- */
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+    .cta {
+        font-family: var(--font-mono);
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        font-size: 0.95rem;
+    }
+    .actions__alt {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        transition: color 0.2s ease;
+    }
+    .actions__alt:hover,
+    .actions__alt:focus-visible {
+        color: var(--c-salmon);
+    }
+
+    /* ---------- Telemetría ---------- */
+    .telemetry {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: clamp(0.6rem, 0.58rem + 0.2vw, 0.72rem);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        border-top: 1px solid #1a1a1a;
+        padding-top: 1rem;
+    }
+    .telemetry span:first-child {
+        color: var(--c-ember);
+    }
+
+    /* ---------- Capas CRT ---------- */
+    .crt__scanlines {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0) 0,
+            rgba(0, 0, 0, 0) 2px,
+            rgba(0, 0, 0, 0.18) 3px,
+            rgba(0, 0, 0, 0.18) 4px
+        );
+        mix-blend-mode: multiply;
+    }
+    .crt__vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        background:
+            radial-gradient(
+                120% 100% at 50% 50%,
+                rgba(153, 0, 0, 0.1) 0%,
+                rgba(8, 8, 8, 0) 40%,
+                rgba(8, 8, 8, 0.85) 100%
+            ),
+            radial-gradient(
+                100% 60% at 50% 0%,
+                rgba(255, 0, 0, 0.06),
+                transparent 60%
+            );
+    }
+    .crt__grain {
+        position: absolute;
+        inset: -50%;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.5;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        animation: grain 0.7s steps(4) infinite;
+    }
+
+    /* ---------- Keyframes ---------- */
+    @keyframes pulse {
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.35;
+            transform: scale(0.82);
+        }
+    }
+    @keyframes grain {
+        0% {
+            transform: translate(0, 0);
+        }
+        25% {
+            transform: translate(-3%, 2%);
+        }
+        50% {
+            transform: translate(2%, -2%);
+        }
+        75% {
+            transform: translate(-2%, -3%);
+        }
+        100% {
+            transform: translate(2%, 2%);
+        }
+    }
+    @keyframes glitch-a {
+        0%,
+        82%,
+        100% {
+            opacity: 0;
+            transform: translate(0, 0);
+            clip-path: inset(0 0 0 0);
+        }
+        84% {
+            opacity: 0.85;
+            transform: translate(-0.04em, 0.015em);
+            clip-path: inset(12% 0 58% 0);
+        }
+        88% {
+            opacity: 0.85;
+            transform: translate(0.03em, -0.02em);
+            clip-path: inset(64% 0 8% 0);
+        }
+        92% {
+            opacity: 0;
+        }
+    }
+    @keyframes glitch-b {
+        0%,
+        78%,
+        100% {
+            opacity: 0;
+            transform: translate(0, 0);
+            clip-path: inset(0 0 0 0);
+        }
+        80% {
+            opacity: 0.8;
+            transform: translate(0.04em, 0.02em);
+            clip-path: inset(40% 0 30% 0);
+        }
+        86% {
+            opacity: 0.8;
+            transform: translate(-0.03em, -0.015em);
+            clip-path: inset(78% 0 4% 0);
+        }
+        90% {
+            opacity: 0;
+        }
+    }
+
+    /* ---------- Reduce-motion ---------- */
+    @media (prefers-reduced-motion: reduce) {
+        .crt__grain,
+        .rec-dot,
+        .glitch::before,
+        .glitch::after {
+            animation: none;
+        }
+        .glitch::before,
+        .glitch::after {
+            opacity: 0;
+        }
+    }
+</style>

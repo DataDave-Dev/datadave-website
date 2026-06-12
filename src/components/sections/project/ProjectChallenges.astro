@@ -1,0 +1,29 @@
+---
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+    challenges: string[];
+}
+const { challenges } = Astro.props;
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<section aria-labelledby="challenges-title">
+    <SectionLabel id="challenges-title">{t("project.challengesLabel")}</SectionLabel>
+    <ul class="flex flex-col gap-4">
+        {
+            challenges.map((c) => (
+                <li class="flex gap-3 border-l-2 border-blood py-1 pl-4">
+                    <span class="font-mono font-bold text-red" aria-hidden="true">
+                        &gt;
+                    </span>
+                    <span class="max-w-[64ch] font-body text-base leading-relaxed text-[#cfc9c4]">
+                        {c}
+                    </span>
+                </li>
+            ))
+        }
+    </ul>
+</section>

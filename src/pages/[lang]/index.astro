@@ -1,0 +1,13 @@
+---
+import type { GetStaticPaths } from "astro";
+import { LOCALES } from "@/i18n/config";
+import Layout from "@/layouts/Layout.astro";
+import Hero from "@/components/sections/Hero.astro";
+
+export const getStaticPaths = (() =>
+    LOCALES.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+---
+
+<Layout>
+    <Hero />
+</Layout>

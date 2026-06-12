@@ -1,0 +1,106 @@
+---
+import { CONTACT, FULL_NAME, getProfile } from "@/const/profile";
+import { DEFAULT_LOCALE, OG_LOCALE, HREFLANG, type Lang } from "@/i18n/config";
+import { useTranslations } from "@/i18n/utils";
+
+type OgType = "website" | "profile" | "article";
+
+interface Props {
+    title: string;
+    description: string;
+    lang?: Lang;
+    image?: string; // social, 1200×630
+    type?: OgType;
+    noindex?: boolean;
+    jsonLd?: Record<string, unknown>[];
+}
+
+const {
+    title,
+    description,
+    lang = DEFAULT_LOCALE,
+    image = "/og.png",
+    type = "website",
+    noindex = false,
+    jsonLd = [],
+} = Astro.props;
+
+const t = useTranslations(lang);
+const SKILLS = getProfile(lang).skills;
+
+const SITE_NAME = "DataDave";
+const site = Astro.site ?? new URL("https://datadave.dev");
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(image, site).href;
+
+// Descarta enlaces placeholder tipo /usuario.
+const sameAs = [CONTACT.github, CONTACT.linkedin].filter(
+    (u) => typeof u === "string" && u.length > 0 && !u.includes("/usuario"),
+);
+
+const person = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: FULL_NAME,
+    alternateName: SITE_NAME,
+    url: site.href,
+    jobTitle: t("seo.jobTitle"),
+    description: t("seo.personDesc"),
+    email: `mailto:${CONTACT.email}`,
+    knowsAbout: SKILLS,
+    ...(sameAs.length ? { sameAs } : {}),
+};
+
+const website = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    url: site.href,
+    inLanguage: HREFLANG[lang],
+    author: { "@type": "Person", name: FULL_NAME },
+};
+
+const schemas = [website, person, ...jsonLd];
+
+// Evita que un </script> dentro de los datos rompa la etiqueta.
+const serialize = (obj: unknown) =>
+    JSON.stringify(obj).replace(/</g, "\\u003c");
+---
+
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta
+    name="robots"
+    content={noindex
+        ? "noindex, nofollow"
+        : "index, follow, max-image-preview:large, max-snippet:-1"}
+/>
+<meta name="author" content={FULL_NAME} />
+<meta name="theme-color" content="#080808" />
+<meta name="color-scheme" content="dark" />
+<meta name="format-detection" content="telephone=no" />
+
+{/* Open Graph */}
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:locale" content={OG_LOCALE[lang]} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={`${SITE_NAME} — ${title}`} />
+
+{/* Twitter */}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{/* Datos estructurados */}
+{
+    schemas.map((schema) => (
+        <script type="application/ld+json" set:html={serialize(schema)} />
+    ))
+}

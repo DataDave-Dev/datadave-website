@@ -1,0 +1,39 @@
+---
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import type { ProjectHighlight } from "@/const/projects";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+    highlights: ProjectHighlight[];
+}
+const { highlights } = Astro.props;
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<section aria-labelledby="highlights-title">
+    <SectionLabel id="highlights-title">{t("project.highlightsLabel")}</SectionLabel>
+    <ul
+        class="grid grid-cols-1 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-2"
+    >
+        {
+            highlights.map((h, i) => (
+                <li class="group flex flex-col gap-3 bg-bg p-6 transition-colors duration-300 hover:bg-[#111]">
+                    <span class="font-mono text-xs tracking-widest text-red">
+                        {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 class="font-display text-xl uppercase leading-tight text-bone">
+                        {h.title}
+                    </h3>
+                    <p class="font-body text-sm leading-relaxed text-[#cfc9c4]">
+                        {h.desc}
+                    </p>
+                    <span
+                        class="mt-auto h-px w-0 bg-blood transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-full"
+                        aria-hidden="true"
+                    />
+                </li>
+            ))
+        }
+    </ul>
+</section>

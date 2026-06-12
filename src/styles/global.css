@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Obsidian Analog — design tokens
+   ============================================================ */
+@theme {
+    --color-bg: #080808;
+    --color-surface: #1a1a1a;
+    --color-blood: #990000;
+    /* Rojo legible para etiquetas de texto sobre el fondo oscuro (AA). */
+    --color-ember: #ff4a32;
+    --color-red: #ff0000;
+    --color-salmon: #e2a399;
+    --color-bone: #ede6e0;
+    /* Gris legible para texto sobre el fondo oscuro (AA ~5.5:1). */
+    --color-dim: #8b857f;
+
+    --font-display: "Anton", system-ui, sans-serif;
+    --font-pixel: "Bytesized", "Anton", monospace;
+    --font-body: "Space Mono", ui-monospace, monospace;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+    --c-bg: #080808;
+    --c-surface: #1a1a1a;
+    --c-blood: #990000;
+    --c-ember: #ff4a32;
+    --c-red: #ff0000;
+    --c-salmon: #e2a399;
+    --c-bone: #ede6e0;
+    --c-dim: #8b857f;
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}

@@ -1,0 +1,182 @@
+---
+import type { GetStaticPaths } from "astro";
+import { LOCALES, type Lang } from "@/i18n/config";
+import { getLangFromUrl, localizePath, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { getProjects } from "@/const/projects";
+import type { Project } from "@/const/projects";
+import { projectId } from "@/const/projectId";
+import { FULL_NAME } from "@/const/profile";
+import ProjectDetailHeader from "@/components/sections/project/ProjectDetailHeader.astro";
+import ProjectOverview from "@/components/sections/project/ProjectOverview.astro";
+import ProjectMetrics from "@/components/sections/project/ProjectMetrics.astro";
+import ProjectHighlights from "@/components/sections/project/ProjectHighlights.astro";
+import ProjectStack from "@/components/sections/project/ProjectStack.astro";
+import ProjectChallenges from "@/components/sections/project/ProjectChallenges.astro";
+import ProjectGallery from "@/components/sections/project/ProjectGallery.astro";
+import ProjectCta from "@/components/sections/project/ProjectCta.astro";
+
+export const getStaticPaths = (() =>
+    LOCALES.flatMap((lang) =>
+        getProjects(lang).map((project) => ({
+            params: { lang, id: projectId(project) },
+            props: { project },
+        })),
+    )) satisfies GetStaticPaths;
+
+interface Props {
+    project: Project;
+}
+const { project } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// ---- SEO: datos estructurados del proyecto ----
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = project.gallery?.[0]?.src;
+
+const projectSchema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.name,
+    description: project.tagline ?? project.desc,
+    url: canonicalUrl,
+    inLanguage: lang,
+    author: { "@type": "Person", name: FULL_NAME },
+    keywords: project.tags.join(", "),
+    ...(project.year ? { dateCreated: project.year } : {}),
+};
+
+const breadcrumb: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+        {
+            "@type": "ListItem",
+            position: 1,
+            name: t("seo.breadcrumbHome"),
+            item: new URL(localizePath("/", lang), Astro.site).href,
+        },
+        {
+            "@type": "ListItem",
+            position: 2,
+            name: t("seo.breadcrumbProjects"),
+            item: `${new URL(localizePath("/about", lang), Astro.site).href}#proyectos`,
+        },
+        { "@type": "ListItem", position: 3, name: project.name },
+    ],
+};
+---
+
+<Layout
+    title={`${project.name} · DataDave`}
+    description={project.tagline ?? project.desc}
+    type="article"
+    image={ogImage}
+    jsonLd={[projectSchema, breadcrumb]}
+>
+    <main id="project" class="crt" aria-labelledby="project-title">
+        <!-- Atmósfera analógica -->
+        <div class="crt__grain" aria-hidden="true"></div>
+        <div class="crt__scanlines" aria-hidden="true"></div>
+        <div class="crt__vignette" aria-hidden="true"></div>
+
+        <div class="frame">
+            <ProjectDetailHeader project={project} />
+            {project.overview && <ProjectOverview overview={project.overview} />}
+            {project.metrics && <ProjectMetrics metrics={project.metrics} />}
+            {
+                project.highlights && (
+                    <ProjectHighlights highlights={project.highlights} />
+                )
+            }
+            {project.stack && <ProjectStack stack={project.stack} />}
+            {
+                project.challenges && (
+                    <ProjectChallenges challenges={project.challenges} />
+                )
+            }
+            {project.gallery && <ProjectGallery gallery={project.gallery} />}
+            <ProjectCta />
+        </div>
+    </main>
+</Layout>
+
+<style>
+    .crt {
+        position: relative;
+        isolation: isolate;
+        min-height: 100svh;
+        width: 100%;
+        background: transparent;
+        color: var(--c-bone);
+        overflow: hidden;
+    }
+
+    .frame {
+        position: relative;
+        z-index: 4;
+        max-width: 72rem;
+        margin-inline: auto;
+        padding: clamp(1.5rem, 1rem + 3vw, 4rem)
+            clamp(1.25rem, 1rem + 4vw, 4rem);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+    }
+
+    /* ---------- Capas CRT compartidas ---------- */
+    .crt__scanlines {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0) 0,
+            rgba(0, 0, 0, 0) 2px,
+            rgba(0, 0, 0, 0.22) 3px,
+            rgba(0, 0, 0, 0.22) 4px
+        );
+        mix-blend-mode: multiply;
+    }
+    .crt__vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        background: radial-gradient(
+            120% 100% at 50% 20%,
+            rgba(153, 0, 0, 0.07) 0%,
+            rgba(8, 8, 8, 0) 45%,
+            rgba(8, 8, 8, 0.8) 100%
+        );
+    }
+    .crt__grain {
+        position: absolute;
+        inset: -50%;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.4;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        animation: grain 0.7s steps(4) infinite;
+    }
+    @keyframes grain {
+        0% {
+            transform: translate(0, 0);
+        }
+        50% {
+            transform: translate(2%, -2%);
+        }
+        100% {
+            transform: translate(-2%, 2%);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .crt__grain {
+            animation: none;
+        }
+    }
+</style>

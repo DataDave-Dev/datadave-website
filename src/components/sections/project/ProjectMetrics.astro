@@ -1,0 +1,32 @@
+---
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import type { ProjectMetric } from "@/const/projects";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+    metrics: ProjectMetric[];
+}
+const { metrics } = Astro.props;
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<section aria-labelledby="metrics-title">
+    <SectionLabel id="metrics-title">{t("project.metricsLabel")}</SectionLabel>
+    <ul
+        class="grid grid-cols-2 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-4"
+    >
+        {
+            metrics.map((m) => (
+                <li class="flex flex-col gap-2 bg-bg p-6">
+                    <span class="font-display text-4xl leading-none text-salmon md:text-5xl">
+                        {m.value}
+                    </span>
+                    <span class="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-dim">
+                        {m.label}
+                    </span>
+                </li>
+            ))
+        }
+    </ul>
+</section>

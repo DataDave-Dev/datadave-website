@@ -1,0 +1,54 @@
+---
+import { getProfile } from "@/const/profile";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const AI_WORKFLOW = getProfile(lang).aiWorkflow;
+---
+
+<section class="about-reveal" aria-labelledby="metodo-title">
+    <h2
+        class="mb-6 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-ember"
+        id="metodo-title"
+    >
+        {t("about.workflowLabel")}
+    </h2>
+
+    <p
+        class="mb-8 max-w-[36ch] font-display text-3xl uppercase leading-[0.95] text-bone md:text-4xl"
+    >
+        {t("about.workflowHeadPre")}<span class="text-salmon"
+            >{t("about.workflowHeadEmph")}</span
+        >{t("about.workflowHeadPost")}
+    </p>
+
+    <ul
+        class="grid grid-cols-1 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-3"
+    >
+        {
+            AI_WORKFLOW.map((w) => (
+                <li class="group flex flex-col gap-3 bg-bg p-6 transition-colors duration-300 hover:bg-[#111]">
+                    <span class="font-mono text-[0.7rem] uppercase tracking-[0.25em] text-red">
+                        {w.k}
+                    </span>
+                    <h3 class="font-display text-xl uppercase leading-none text-bone">
+                        {w.t}
+                    </h3>
+                    <p class="font-body text-sm leading-relaxed text-[#cfc9c4]">
+                        {w.d}
+                    </p>
+                    <span
+                        class="mt-auto h-px w-0 bg-blood transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-full"
+                        aria-hidden="true"
+                    />
+                </li>
+            ))
+        }
+    </ul>
+
+    <p class="mt-5 font-mono text-[0.72rem] uppercase tracking-[0.18em] text-dim">
+        <span class="text-salmon">{t("about.workflowStackLabel")}</span>
+        {" "}{t("about.workflowStackText")}
+    </p>
+</section>

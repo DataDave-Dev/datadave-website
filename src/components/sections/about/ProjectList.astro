@@ -1,0 +1,83 @@
+---
+import { getProjects } from "@/const/projects";
+import { projectId } from "@/const/projectId";
+import Button from "@/components/ui/Button.astro";
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const PROJECTS = getProjects(lang);
+---
+
+<section
+    id="proyectos"
+    class="scroll-mt-24 about-reveal"
+    aria-labelledby="proyectos-title"
+>
+    <h2
+        class="mb-6 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-ember"
+        id="proyectos-title"
+    >
+        {t("about.projectsLabel")}
+    </h2>
+
+    <ul
+        class="grid grid-cols-1 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-2 lg:grid-cols-3"
+    >
+        {
+            PROJECTS.map((p) => (
+                <li class="group relative flex flex-col gap-4 bg-bg p-6 transition-colors duration-300 hover:bg-[#111]">
+                    <div class="flex items-baseline justify-between">
+                        <span class="font-mono text-xs tracking-widest text-red">
+                            {p.idx}
+                        </span>
+                        <div class="flex gap-3 font-mono text-[0.7rem] uppercase tracking-[0.12em] text-dim">
+                            {p.demo && (
+                                <a
+                                    href={p.demo}
+                                    class="transition-colors duration-200 hover:text-salmon"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    demo↗
+                                </a>
+                            )}
+                            {p.repo && (
+                                <a
+                                    href={p.repo}
+                                    class="transition-colors duration-200 hover:text-salmon"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    repo↗
+                                </a>
+                            )}
+                        </div>
+                    </div>
+
+                    <h3 class="font-display text-2xl uppercase leading-none text-bone">
+                        {p.name}
+                    </h3>
+
+                    <p class="font-body text-sm leading-relaxed text-[#cfc9c4]">
+                        {p.desc}
+                    </p>
+
+                    <ul class="flex flex-wrap gap-2 pt-2 font-mono text-[0.65rem] uppercase tracking-widest text-dim">
+                        {p.tags.map((t) => (
+                            <li class="border border-[#262626] px-2 py-0.5">{t}</li>
+                        ))}
+                    </ul>
+
+                    <Button
+                        link={localizePath(`/projects/${projectId(p)}`, lang)}
+                        class="mt-auto w-full text-center font-mono text-[0.72rem] uppercase tracking-[0.2em]"
+                        aria-label={t("project.viewDetailAria", { name: p.name })}
+                    >
+                        {t("project.viewDetail")}
+                    </Button>
+                </li>
+            ))
+        }
+    </ul>
+</section>

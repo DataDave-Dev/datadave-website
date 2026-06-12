@@ -1,0 +1,28 @@
+---
+// Pie tipo telemetría analógica (decorativo).
+---
+
+<footer class="telemetry about-reveal" aria-hidden="true">
+    <span>SIGNAL ▰▰▰▰▰▰▱</span>
+    <span>NTSC · 60Hz</span>
+    <span>ON AIR SINCE 2022</span>
+</footer>
+
+<style>
+    .telemetry {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: clamp(0.6rem, 0.58rem + 0.2vw, 0.72rem);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        border-top: 1px solid #1a1a1a;
+        padding-top: 1rem;
+    }
+    .telemetry span:first-child {
+        color: var(--c-blood);
+    }
+</style>

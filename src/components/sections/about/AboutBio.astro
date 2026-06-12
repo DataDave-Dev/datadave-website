@@ -1,0 +1,207 @@
+---
+import { getProfile } from "@/const/profile";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const SPECS = getProfile(lang).specs;
+---
+
+<section class="grid">
+    <div class="bio about-reveal">
+        <h2 class="block-title">{t("about.historyLabel")}</h2>
+        <p>{t("about.history1")}</p>
+        <p>{t("about.history2")}</p>
+    </div>
+
+    <aside class="specs-wrap about-reveal" aria-label={t("about.specAria")}>
+        <div class="specs" data-tilt>
+            <h2 class="block-title">{t("about.specLabel")}</h2>
+            <dl>
+                {
+                    SPECS.map((s) => (
+                        <div class="spec-row">
+                            <dt>{s.k}</dt>
+                            <dd>{s.v}</dd>
+                        </div>
+                    ))
+                }
+            </dl>
+            <span class="specs__glare" aria-hidden="true"></span>
+        </div>
+    </aside>
+</section>
+
+<style>
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: clamp(1.5rem, 1rem + 3vw, 3rem);
+    }
+    @media (min-width: 768px) {
+        .grid {
+            grid-template-columns: 1.6fr 1fr;
+        }
+    }
+
+    .block-title {
+        margin: 0 0 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        font-weight: 500;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--c-ember);
+    }
+
+    .bio p {
+        margin: 0 0 1rem;
+        font-family: var(--font-body);
+        font-size: 1.02rem;
+        line-height: 1.7;
+        color: #cfc9c4;
+        max-width: 52ch;
+    }
+
+    /* ---------- Ficha 3D ---------- */
+    .specs-wrap {
+        perspective: 900px;
+    }
+    .specs {
+        position: relative;
+        border: 1px solid #1c1c1c;
+        background: linear-gradient(
+            160deg,
+            rgba(26, 26, 26, 0.5),
+            rgba(8, 8, 8, 0)
+        );
+        padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+        transform-style: preserve-3d;
+        transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+        transition:
+            transform 0.4s var(--ease-out-expo),
+            box-shadow 0.3s ease,
+            border-color 0.3s ease;
+        box-shadow: 0 12px 30px -24px rgba(0, 0, 0, 0.8);
+        will-change: transform;
+    }
+    /* Mientras sigue el cursor, respuesta inmediata */
+    .specs.is-tilting {
+        transition:
+            transform 0.07s ease-out,
+            box-shadow 0.3s ease,
+            border-color 0.3s ease;
+        border-color: rgba(255, 74, 50, 0.4);
+        box-shadow:
+            0 32px 55px -26px rgba(0, 0, 0, 0.9),
+            0 0 45px -22px rgba(255, 74, 50, 0.35);
+    }
+
+    /* Profundidad: el título y los datos flotan por encima de la tarjeta */
+    .specs .block-title {
+        transform: translateZ(38px);
+    }
+    .specs dl {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        transform: translateZ(22px);
+    }
+
+    /* Brillo que sigue el cursor */
+    .specs__glare {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        background: radial-gradient(
+            circle at var(--gx, 50%) var(--gy, 50%),
+            rgba(255, 255, 255, 0.11),
+            rgba(255, 255, 255, 0) 42%
+        );
+        transition: opacity 0.3s ease;
+        transform: translateZ(40px);
+    }
+    .specs.is-tilting .specs__glare {
+        opacity: 1;
+    }
+
+    .spec-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px dashed #232323;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+    }
+    .spec-row:last-child {
+        border-bottom: 0;
+    }
+    .spec-row dt {
+        color: var(--c-dim);
+        letter-spacing: 0.15em;
+    }
+    .spec-row dd {
+        margin: 0;
+        color: var(--c-bone);
+        text-align: right;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .specs {
+            transition: none;
+            transform: none !important;
+        }
+        .specs .block-title,
+        .specs dl {
+            transform: none;
+        }
+        .specs__glare {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    function setupTilt(card: HTMLElement): void {
+        if (card.dataset.tiltReady) return;
+        card.dataset.tiltReady = "1";
+
+        // Sin tilt si el usuario pidió menos movimiento
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+            return;
+
+        const MAX = 11; // grados máximos de inclinación
+
+        card.addEventListener("pointermove", (e) => {
+            // El tilt es solo para mouse/lápiz; en táctil no interferimos
+            if (e.pointerType === "touch") return;
+            const r = card.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width;
+            const py = (e.clientY - r.top) / r.height;
+            card.style.setProperty("--ry", `${((px - 0.5) * 2 * MAX).toFixed(2)}deg`);
+            card.style.setProperty(
+                "--rx",
+                `${(-(py - 0.5) * 2 * MAX).toFixed(2)}deg`,
+            );
+            card.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
+            card.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
+            card.classList.add("is-tilting");
+        });
+
+        card.addEventListener("pointerleave", () => {
+            card.style.setProperty("--rx", "0deg");
+            card.style.setProperty("--ry", "0deg");
+            card.classList.remove("is-tilting");
+        });
+    }
+
+    function initTilts(): void {
+        document
+            .querySelectorAll<HTMLElement>("[data-tilt]")
+            .forEach(setupTilt);
+    }
+
+    document.addEventListener("astro:page-load", initTilts);
+</script>

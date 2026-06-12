@@ -1,0 +1,86 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Variant = "primary" | "secondary" | "ghost";
+
+interface BaseProps {
+    title?: string; // texto, o pásalo por <slot>
+    class?: string;
+    variant?: Variant;
+}
+
+// <a> si recibe link, si no <button>.
+type Props =
+    | (BaseProps & { link: string } & Omit<
+              HTMLAttributes<"a">,
+              "class" | "type"
+          >)
+    | (BaseProps & { link?: undefined } & Omit<
+              HTMLAttributes<"button">,
+              "class"
+          >);
+
+const {
+    link,
+    title,
+    class: className,
+    variant = "primary",
+    ...rest
+} = Astro.props;
+
+const classList = [
+    "fill-left px-6 py-2 text-[#E2A399] border-4 border-[#E2A399] hover:cursor-pointer",
+    className,
+];
+---
+
+{
+    link ? (
+        <a class:list={classList} href={link} {...rest}>
+            <slot>{title}</slot>
+        </a>
+    ) : (
+        <button class:list={classList} type="button" {...rest}>
+            <slot>{title}</slot>
+        </button>
+    )
+}
+
+<style>
+    .fill-left {
+        /* El texto debe quedar por encima del relleno */
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        transition: color 900ms ease;
+    }
+
+    .fill-left::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background-color: #e2a399;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fill-left:hover::before,
+    .fill-left:focus-visible::before {
+        transform: scaleX(1);
+    }
+
+    /* Texto legible cuando el fondo se llena */
+    .fill-left:hover,
+    .fill-left:focus-visible {
+        color: #1a1a1a;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .fill-left,
+        .fill-left::before {
+            transition: none;
+        }
+    }
+</style>

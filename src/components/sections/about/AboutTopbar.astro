@@ -1,0 +1,53 @@
+---
+// Barra superior: volver al inicio + canal del "sistema" + idioma.
+import LanguageToggle from "@/components/ui/LanguageToggle.astro";
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<header class="topbar about-reveal">
+    <a href={localizePath("/", lang)} class="back">{t("nav.back")}</a>
+    <span class="topbar__right">
+        <span class="topbar__sys">{t("about.channel")}</span>
+        <LanguageToggle />
+    </span>
+</header>
+
+<style>
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: clamp(0.65rem, 0.6rem + 0.3vw, 0.8rem);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+    }
+    .topbar__right {
+        display: inline-flex;
+        align-items: center;
+        gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+        flex-wrap: wrap;
+    }
+    .back {
+        color: var(--c-salmon);
+        text-decoration: none;
+        border: 1px solid #2a2a2a;
+        padding: 0.45em 0.9em;
+        transition:
+            color 0.3s,
+            border-color 0.3s,
+            background 0.3s;
+    }
+    .back:hover,
+    .back:focus-visible {
+        color: var(--c-bg);
+        background: var(--c-salmon);
+        border-color: var(--c-salmon);
+    }
+</style>

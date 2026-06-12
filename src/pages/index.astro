@@ -1,11 +1,60 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+// Raíz: sin contenido propio. Detecta el idioma en el cliente y redirige a
+// /es o /en, con fallback sin JS (meta refresh) y noindex.
+import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const site = Astro.site ?? new URL("https://datadave.dev");
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<!doctype html>
+<html lang={DEFAULT_LOCALE}>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="noindex, follow" />
+        <title>DataDave</title>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {
+            LOCALES.map((l) => (
+                <link
+                    rel="alternate"
+                    hreflang={l}
+                    href={new URL(`/${l}`, site).href}
+                />
+            ))
+        }
+        <link
+            rel="alternate"
+            hreflang="x-default"
+            href={new URL(`/${DEFAULT_LOCALE}`, site).href}
+        />
+        <link rel="canonical" href={new URL(`/${DEFAULT_LOCALE}`, site).href} />
+        <script is:inline define:vars={{ locales: LOCALES, fallback: DEFAULT_LOCALE }}>
+            (function () {
+                try {
+                    var prefs = navigator.languages || [navigator.language || ""];
+                    var pick = fallback;
+                    for (var i = 0; i < prefs.length; i++) {
+                        var code = String(prefs[i]).toLowerCase().slice(0, 2);
+                        if (locales.indexOf(code) !== -1) {
+                            pick = code;
+                            break;
+                        }
+                    }
+                    location.replace("/" + pick);
+                } catch (e) {
+                    location.replace("/" + fallback);
+                }
+            })();
+        </script>
+        <noscript>
+            <meta http-equiv="refresh" content={`0; url=/${DEFAULT_LOCALE}`} />
+        </noscript>
+    </head>
+    <body>
+        <p>
+            Redirigiendo… / Redirecting…
+            <a href={`/${DEFAULT_LOCALE}`}>DataDave</a>
+        </p>
+    </body>
+</html>

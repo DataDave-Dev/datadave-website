@@ -1,0 +1,97 @@
+---
+import type { Project } from "@/const/projects";
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+
+interface Props {
+    project: Project;
+}
+const { project } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<header class="flex flex-col gap-7">
+    <a
+        href={localizePath("/about", lang)}
+        class="self-start border border-[#2a2a2a] px-3.5 py-2 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-salmon transition-colors duration-300 hover:border-salmon hover:bg-salmon hover:text-bg"
+    >
+        {t("nav.back")}
+    </a>
+
+    <div class="flex flex-col gap-4">
+        <p
+            class="font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-ember"
+        >
+            {t("project.label")} {project.idx}
+        </p>
+        <h1
+            id="project-title"
+            class="font-display text-5xl uppercase leading-[0.9] text-bone md:text-7xl"
+        >
+            {project.name}
+        </h1>
+        {
+            project.tagline && (
+                <p class="max-w-[52ch] font-body text-lg leading-relaxed text-[#d6cfc9] md:text-xl">
+                    {project.tagline}
+                </p>
+            )
+        }
+    </div>
+
+    <div
+        class="flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-xs uppercase tracking-[0.16em] text-dim"
+    >
+        {
+            project.role && (
+                <span>
+                    <span class="text-salmon">{t("project.role")}</span> {project.role}
+                </span>
+            )
+        }
+        {
+            project.year && (
+                <span>
+                    <span class="text-salmon">{t("project.year")}</span> {project.year}
+                </span>
+            )
+        }
+        {
+            project.demo && (
+                <a
+                    href={project.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-bone transition-colors duration-200 hover:text-salmon"
+                >
+                    DEMO↗
+                </a>
+            )
+        }
+        {
+            project.repo && (
+                <a
+                    href={project.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-bone transition-colors duration-200 hover:text-salmon"
+                >
+                    REPO↗
+                </a>
+            )
+        }
+    </div>
+
+    <ul
+        class="flex flex-wrap gap-2 font-mono text-[0.7rem] uppercase tracking-[0.15em] text-dim"
+    >
+        {
+            project.tags.map((t) => (
+                <li class="border border-[#262626] px-2.5 py-1 text-bone/85">
+                    {t}
+                </li>
+            ))
+        }
+    </ul>
+</header>

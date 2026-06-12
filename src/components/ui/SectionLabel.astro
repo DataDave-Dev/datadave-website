@@ -1,0 +1,18 @@
+---
+// Etiqueta de sección reutilizable, estilo "// TÍTULO".
+interface Props {
+    id?: string;
+    class?: string;
+}
+const { id, class: className } = Astro.props;
+---
+
+<h2
+    id={id}
+    class:list={[
+        "mb-6 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-ember",
+        className,
+    ]}
+>
+    <slot />
+</h2>

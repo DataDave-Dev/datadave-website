@@ -1,23 +1,760 @@
+---
+import { ClientRouter } from "astro:transitions";
+import Seo from "@/components/seo/Seo.astro";
+import { LOCALES, HREFLANG, DEFAULT_LOCALE } from "@/i18n/config";
+import {
+	getLangFromUrl,
+	useTranslations,
+	switchLocalePath,
+} from "@/i18n/utils";
+import "../styles/global.css";
+import "@fontsource/anton";
+import "@fontsource/bytesized";
+import "@fontsource/space-mono/400.css";
+import "@fontsource/space-mono/700.css";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string; // social, 1200×630 (por defecto /og.png)
+	type?: "website" | "profile" | "article";
+	noindex?: boolean;
+	jsonLd?: Record<string, unknown>[];
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const {
+	title = t("seo.defaultTitle"),
+	description = t("seo.defaultDesc"),
+	image,
+	type = "website",
+	noindex = false,
+	jsonLd = [],
+} = Astro.props;
+
+const site = Astro.site ?? new URL("https://datadave.dev");
+// Alternates hreflang: la misma página en cada idioma, con x-default a ES.
+const alternates = LOCALES.map((l) => ({
+	hreflang: HREFLANG[l],
+	href: new URL(switchLocalePath(Astro.url, l), site).href,
+}));
+const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href;
+---
+
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{title}</title>
+		<Seo
+			lang={lang}
+			title={title}
+			description={description}
+			image={image}
+			type={type}
+			noindex={noindex}
+			jsonLd={jsonLd}
+		/>
+		{
+			alternates.map((a) => (
+				<link rel="alternate" hreflang={a.hreflang} href={a.href} />
+			))
+		}
+		<link rel="alternate" hreflang="x-default" href={xDefault} />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		<ClientRouter />
+		{/* Ocultamos el hero hasta que cargue la fuente pixel, para evitar el salto. */}
+		<script is:inline>
+			document.documentElement.classList.add("js", "fonts-loading");
+			(function () {
+				var done = function () {
+					var r = document.documentElement;
+					r.classList.remove("fonts-loading");
+					r.classList.add("fonts-ready");
+				};
+				if (document.fonts && document.fonts.ready) {
+					document.fonts.ready.then(done);
+					setTimeout(done, 1500); // red de seguridad
+				} else {
+					done();
+				}
+			})();
+		</script>
 	</head>
 	<body>
 		<slot />
 	</body>
 </html>
 
+<script>
+	import { navigate } from "astro:transitions/client";
+
+	const prefersReduced = () =>
+		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	// En SPA el hash de destino aún no está en window.location cuando corre la
+	// entrada de /about; lo capturamos del evento de Astro y lo usamos de respaldo.
+	let pendingHash = "";
+	const currentHash = () => window.location.hash || pendingHash;
+
+	// Referencia al plugin (cargado bajo demanda) para poder matar los triggers
+	// de About antes de cada swap SPA y no dejar instancias sobre DOM eliminado.
+	let ScrollTriggerRef:
+		| typeof import("gsap/ScrollTrigger").ScrollTrigger
+		| null = null;
+
+	// Del hero a /about: apagado de tubo CRT y luego navegación sin recarga.
+	function bindHeroExit() {
+		const cta = document.getElementById("enter-cta");
+		if (!cta || cta.dataset.bound) return;
+		cta.dataset.bound = "1";
+		const hero = document.getElementById("hero");
+
+		cta.addEventListener("click", async (event) => {
+			event.preventDefault();
+			const href = cta.getAttribute("href") ?? "/about";
+			if (prefersReduced()) {
+				navigate(href);
+				return;
+			}
+			const { gsap } = await import("gsap");
+			const tl = gsap.timeline({ onComplete: () => navigate(href) });
+			tl.to(hero, {
+				x: 7,
+				duration: 0.05,
+				repeat: 8,
+				yoyo: true,
+				ease: "rough({ strength: 3, points: 18, randomize: true })",
+			})
+				.to(
+					hero,
+					{
+						filter: "brightness(2.6) saturate(1.5)",
+						duration: 0.14,
+						ease: "power2.in",
+					},
+					"<",
+				)
+				.set("#fx-line", { opacity: 1, scaleX: 1, scaleY: 1 })
+				.set("#fx-black", { opacity: 1 })
+				.to("#fx-line", {
+					scaleY: 0.0035,
+					duration: 0.34,
+					ease: "expo.in",
+				})
+				.to(
+					"#fx-line",
+					{ scaleX: 0, duration: 0.24, ease: "power3.in" },
+					"+=0.06",
+				)
+				.to("#fx-line", { opacity: 0, duration: 0.12 });
+		});
+	}
+
+	// Vida del titular tras la entrada (estilo gsap.com): el wordmark respira en
+	// bucle y cada letra se eleva/inclina magnéticamente hacia el cursor. Sólo en
+	// punteros finos; en móvil/táctil no aporta y se omite. Se liga una vez por
+	// elemento hero (el swap de Astro reemplaza el nodo y los listeners mueren).
+	type GsapLike = typeof import("gsap").gsap;
+
+	// Atmósfera CRT en bucle, toda con GSAP (antes eran @keyframes CSS): lava de
+	// las letras, haz de barrido, grano, latido REC y parpadeo del cursor. Se
+	// liga una vez por hero; el swap de Astro reemplaza el nodo y los tweens
+	// quedan huérfanos y se recogen.
+	function startAtmosphere(hero: HTMLElement, gsap: GsapLike) {
+		if (hero.dataset.fxBound) return;
+		hero.dataset.fxBound = "1";
+
+		// Lava: cada letra desplaza su textura en bucle continuo (ease none =
+		// sin costuras), desfasada por índice para que no laten todas igual.
+		gsap.utils
+			.toArray<HTMLElement>(hero.querySelectorAll(".retro-letter"))
+			.forEach((el, i) => {
+				gsap
+					.fromTo(
+						el,
+						{ "--boil-x": "0px" },
+						{
+							"--boil-x": "-220px",
+							duration: 5,
+							ease: "none",
+							repeat: -1,
+						},
+					)
+					.progress(((0.42 * i) / 5) % 1);
+			});
+
+		// Haz de barrido del tubo.
+		const beam = hero.querySelector(".crt__beam");
+		if (beam)
+			gsap.fromTo(
+				beam,
+				{ yPercent: -120 },
+				{ yPercent: 440, duration: 7, ease: "none", repeat: -1 },
+			);
+
+		// Grano de película: temblor escalonado (4 saltos por ciclo de 0.7s).
+		const grain = hero.querySelector(".crt__grain");
+		if (grain)
+			gsap
+				.timeline({ repeat: -1 })
+				.set(grain, { xPercent: 0, yPercent: 0 })
+				.set(grain, { xPercent: -3, yPercent: 2 }, 0.175)
+				.set(grain, { xPercent: 2, yPercent: -2 }, 0.35)
+				.set(grain, { xPercent: -2, yPercent: -3 }, 0.525)
+				.set(grain, { xPercent: 2, yPercent: 2 }, 0.7);
+
+		// Punto REC: latido suave.
+		const dot = hero.querySelector(".rec-dot");
+		if (dot)
+			gsap.to(dot, {
+				opacity: 0.35,
+				scale: 0.82,
+				duration: 0.7,
+				ease: "sine.inOut",
+				repeat: -1,
+				yoyo: true,
+				transformOrigin: "50% 50%",
+			});
+
+		// Cursor de sistema: parpadeo duro.
+		const caret = hero.querySelector(".caret");
+		if (caret)
+			gsap.to(caret, {
+				opacity: 0,
+				duration: 0.52,
+				ease: "steps(1)",
+				repeat: -1,
+				yoyo: true,
+			});
+	}
+
+	function startLetterLife(hero: HTMLElement, gsap: GsapLike) {
+		if (hero.dataset.lifeBound) return;
+		hero.dataset.lifeBound = "1";
+
+		const word = hero.querySelector<HTMLElement>(".retro-word");
+		const letters = gsap.utils.toArray<HTMLElement>(
+			hero.querySelectorAll(".retro-letter"),
+		);
+		if (!word || !letters.length) return;
+
+		// Cada letra flota por su cuenta, con su propia fase y ritmo (desfases
+		// por índice, sin sincronizar). Arranca desde la posición actual (0, donde
+		// la dejó la entrada) con `to`, así no hay salto entre entrada y vida. El
+		// idle usa yPercent + rotation; el magnetismo usa x + y (px): propiedades
+		// de transform distintas, GSAP las compone sin que una pise a la otra.
+		letters.forEach((el, i) => {
+			gsap.to(el, {
+				yPercent: -7,
+				duration: 2 + (i % 3) * 0.45,
+				ease: "sine.inOut",
+				repeat: -1,
+				yoyo: true,
+				delay: i * 0.12,
+			});
+			gsap.to(el, {
+				rotation: i % 2 ? 2.5 : -2.5,
+				duration: 2.6 + (i % 4) * 0.5,
+				ease: "sine.inOut",
+				repeat: -1,
+				yoyo: true,
+				delay: i * 0.18,
+				transformOrigin: "50% 100%",
+			});
+		});
+
+		// Glow del fósforo al pasar por encima (antes era :hover en CSS). Entrada
+		// rápida para que se sienta inmediato; salida algo más relajada.
+		const COOL = "drop-shadow(0 0 0.11em rgba(255, 38, 0, 0.42))";
+		const HOT = "drop-shadow(0 0 0.2em rgba(255, 60, 0, 0.7))";
+		word.addEventListener("pointerenter", () =>
+			gsap.to(word, { filter: HOT, duration: 0.2, ease: "power2.out" }),
+		);
+		word.addEventListener("pointerleave", () =>
+			gsap.to(word, { filter: COOL, duration: 0.4, ease: "power2.out" }),
+		);
+
+		// Sin magnetismo en táctil: no hay cursor que seguir.
+		if (!window.matchMedia("(pointer: fine)").matches) return;
+
+		const move = letters.map((el) => ({
+			x: gsap.quickTo(el, "x", { duration: 0.4, ease: "power3" }),
+			y: gsap.quickTo(el, "y", { duration: 0.4, ease: "power3" }),
+		}));
+
+		const RADIUS = 240;
+		let centers: { cx: number; cy: number }[] = [];
+		const measure = () => {
+			centers = letters.map((el) => {
+				const r = el.getBoundingClientRect();
+				return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+			});
+		};
+
+		const onMove = (e: PointerEvent) => {
+			for (let i = 0; i < letters.length; i++) {
+				const { cx, cy } = centers[i];
+				const dx = e.clientX - cx;
+				const dy = e.clientY - cy;
+				const f = Math.max(0, 1 - Math.hypot(dx, dy) / RADIUS);
+				move[i].x(dx * 0.14 * f);
+				move[i].y(-30 * f + dy * 0.05 * f);
+			}
+		};
+		const reset = () =>
+			move.forEach((m) => {
+				m.x(0);
+				m.y(0);
+			});
+
+		// Clave: reaccionar ya al ENTRAR (con las coords del propio evento), no
+		// esperar al primer movimiento — esa espera era el "delay". Listeners en
+		// el propio nodo: no hay fugas.
+		word.addEventListener("pointerenter", (e) => {
+			measure();
+			onMove(e);
+		});
+		word.addEventListener("pointermove", onMove);
+		word.addEventListener("pointerleave", reset);
+	}
+
+	// Entrada del hero: encendido de letras + cascada del resto. Mismo principio
+	// que /about: si GSAP falla o hay reduce-motion, el contenido se ve igual.
+	async function runHeroEntrance() {
+		const hero = document.getElementById("hero");
+		if (!hero) return;
+		const readout = hero.querySelector<HTMLElement>(".readout");
+		const core = hero.querySelector<HTMLElement>(".core");
+		const telemetry = hero.querySelector<HTMLElement>(".telemetry");
+		if (!core) return;
+
+		// Bloques ocultos por CSS (.js) — hay que ponerles opacity 1 a mano.
+		const gated = [readout, core, telemetry].filter(Boolean) as HTMLElement[];
+		const inner = hero.querySelectorAll<HTMLElement>(
+			".kicker, .retro-letter, .subhead, .actions, .stack-strip > li",
+		);
+		const showHero = () => {
+			gated.forEach((el) => {
+				el.style.opacity = "1";
+				el.style.transform = "";
+			});
+			inner.forEach((el) => {
+				el.style.opacity = "";
+				el.style.transform = "";
+				el.style.filter = "";
+			});
+		};
+
+		if (prefersReduced()) {
+			showHero();
+			return;
+		}
+
+		const safety = window.setTimeout(showHero, 2400);
+		try {
+			// Esperamos a las fuentes (con tope) para no animar con la pixel a medias.
+			await Promise.race([
+				document.fonts ? document.fonts.ready : Promise.resolve(),
+				new Promise((r) => setTimeout(r, 1200)),
+			]);
+			const { gsap } = await import("gsap");
+			// Atmósfera CRT en bucle (independiente de la entrada).
+			startAtmosphere(hero, gsap);
+			// Baseline visible para que `from` lea el destino bien (no el 0 del CSS).
+			gsap.set(gated, { opacity: 1 });
+			const tl = gsap.timeline({
+				defaults: { ease: "power3.out" },
+				onComplete: () => {
+					window.clearTimeout(safety);
+					startLetterLife(hero, gsap);
+				},
+			});
+			tl.from(readout, { y: -18, opacity: 0, duration: 0.6 })
+				.from(
+					hero.querySelector(".kicker"),
+					{ x: -28, opacity: 0, duration: 0.6 },
+					"-=0.35",
+				)
+				.from(
+					hero.querySelectorAll(".retro-letter"),
+					{
+						opacity: 0,
+						yPercent: 150,
+						scale: 0.4,
+						rotationX: -90,
+						// Cada letra cae con su propia inclinación (par/impar),
+						// para que se lea el ensamblado letra a letra.
+						rotation: (i: number) => (i % 2 ? 16 : -16),
+						transformOrigin: "50% 100% -40px",
+						filter: "blur(8px)",
+						duration: 0.95,
+						ease: "elastic.out(1, 0.7)",
+						stagger: { each: 0.09, from: "start" },
+					},
+					"-=0.2",
+				)
+				.from(
+					hero.querySelector(".subhead"),
+					{ y: 24, opacity: 0, duration: 0.7 },
+					"-=0.25",
+				)
+				.from(
+					hero.querySelector(".actions"),
+					{ y: 18, opacity: 0, duration: 0.6 },
+					"-=0.45",
+				)
+				.from(
+					hero.querySelectorAll(".stack-strip > li"),
+					{ y: 14, opacity: 0, duration: 0.5, stagger: 0.05 },
+					"-=0.4",
+				)
+				.from(
+					telemetry,
+					{ y: 10, opacity: 0, duration: 0.6 },
+					"-=0.35",
+				);
+		} catch {
+			window.clearTimeout(safety);
+			showHero();
+		}
+	}
+
+	// Reveal por scroll de About + acentos atados al scroll (parallax/scrub).
+	// Reemplaza al antiguo .from(".about-reveal") en bloque. Mata triggers previos
+	// para rehacerse limpio en cada entrada SPA. "Una vez": cada grupo se revela al
+	// entrar y se queda (once:true). Con `reduced` cae a fades suaves (sin
+	// desplazamientos grandes ni parallax/scrub) por accesibilidad.
+	function setupAboutScroll(
+		gsap: GsapLike,
+		ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger,
+		reduced: boolean,
+	) {
+		ScrollTrigger.getAll().forEach((t) => t.kill());
+
+		// Catálogo de efectos. `wipe` = barrido tipo pantalla CRT; `rise` = entrada
+		// 3D con blur y escala; `fade` = aparición simple. En reduce-motion todos
+		// son sólo opacidad.
+		type Fx = { from: object; to: Record<string, unknown> };
+		const E: Record<string, Fx> = reduced
+			? {
+					wipe: { from: { opacity: 0 }, to: { opacity: 1, duration: 0.6, ease: "power2.out" } },
+					rise: { from: { opacity: 0 }, to: { opacity: 1, duration: 0.6, ease: "power2.out" } },
+					fade: { from: { opacity: 0 }, to: { opacity: 1, duration: 0.6, ease: "power2.out" } },
+				}
+			: {
+					wipe: {
+						from: { opacity: 0, clipPath: "inset(0 100% 0 0)", skewX: 8, y: 16 },
+						to: {
+							opacity: 1,
+							clipPath: "inset(0 0% 0 0)",
+							skewX: 0,
+							y: 0,
+							duration: 1.0,
+							ease: "power4.out",
+						},
+					},
+					rise: {
+						from: {
+							y: 100,
+							opacity: 0,
+							scale: 0.9,
+							rotationX: -32,
+							transformPerspective: 800,
+							transformOrigin: "50% 100%",
+							filter: "blur(12px)",
+						},
+						to: {
+							y: 0,
+							opacity: 1,
+							scale: 1,
+							rotationX: 0,
+							filter: "blur(0px)",
+							duration: 0.95,
+							ease: "power4.out",
+						},
+					},
+					fade: {
+						from: { y: 40, opacity: 0 },
+						to: { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+					},
+				};
+
+		// Lista plana de TODO lo animable de About, en orden del DOM
+		// (querySelectorAll devuelve en orden de documento = arriba→abajo).
+		const about = document.getElementById("about");
+		if (!about) return;
+		const HEAD_SEL = "h1, h2, h3, .title, .block-title, p.font-display";
+		const targets = Array.from(
+			about.querySelectorAll<HTMLElement>(
+				[
+					".topbar",
+					".lead > .about-reveal",
+					".bio > *",
+					".specs-wrap",
+					".skills > .block-title",
+					".skill-list > li",
+					'[aria-labelledby="metodo-title"] > :not(ul)',
+					'[aria-labelledby="metodo-title"] > ul > li',
+					"#proyectos > :not(ul)",
+					"#proyectos > ul > li",
+					'[aria-labelledby="testimonios-title"] > :not(ul)',
+					'[aria-labelledby="testimonios-title"] > ul > li',
+					"#contacto > :not(ul)",
+					".telemetry",
+				].join(", "),
+			),
+		);
+		if (!targets.length) return;
+
+		// Estado inicial oculto (sólo lo aún no revelado) para que no parpadeen
+		// antes de su turno.
+		gsap.set(
+			targets.filter((el) => !el.dataset.revealed),
+			{ opacity: 0 },
+		);
+
+		// Cada elemento tiene su trigger, pero `batch` agrupa los que entran juntos
+		// y los animo EN CASCADA ordenada por posición vertical real (y luego
+		// horizontal): siempre arriba→abajo, primero lo primero. `revealed` = una
+		// vez. Los títulos barren (wipe); todo lo demás entra en 3D (rise).
+		const STEP = reduced ? 0.05 : 0.08;
+		ScrollTrigger.batch(targets, {
+			start: "top 85%",
+			once: true,
+			interval: 0.12,
+			onEnter: (els) => {
+				const fresh = (els as HTMLElement[])
+					.filter((el) => !el.dataset.revealed)
+					.sort((a, b) => {
+						const ra = a.getBoundingClientRect();
+						const rb = b.getBoundingClientRect();
+						return ra.top - rb.top || ra.left - rb.left;
+					});
+				fresh.forEach((el, i) => {
+					el.dataset.revealed = "1";
+					const fx =
+						!reduced && el.matches(HEAD_SEL) ? E.wipe : E.rise;
+					gsap.fromTo(el, fx.from, { ...fx.to, delay: i * STEP });
+				});
+			},
+		});
+
+		// En reduce-motion no hay parallax ni scrub (sólo fades). El acento queda
+		// dibujado por CSS.
+		if (reduced) {
+			ScrollTrigger.refresh();
+			return;
+		}
+
+		// Parallax marcado en encabezados (scrub). Usa yPercent para no pelearse
+		// con el reveal, que animó `y` en px y terminó en 0.
+		const parallax = (
+			elSel: string,
+			sectionSel: string,
+			yPercent: number,
+			startAtTop = false,
+		) => {
+			const el = document.querySelector(elSel);
+			const trigger = document.querySelector(sectionSel);
+			if (!el || !trigger) return;
+			gsap.to(el, {
+				yPercent,
+				ease: "none",
+				scrollTrigger: {
+					trigger,
+					start: startAtTop ? "top top" : "top bottom",
+					end: "bottom top",
+					scrub: true,
+				},
+			});
+		};
+		// El título del Lead ya está arriba al cargar: start "top top" para que no
+		// arranque desplazado.
+		parallax("#about-title", ".lead", -18, true);
+		parallax(
+			'[aria-labelledby="metodo-title"] > p.font-display',
+			'[aria-labelledby="metodo-title"]',
+			-12,
+		);
+		parallax(
+			'[aria-labelledby="testimonios-title"] > p.font-display',
+			'[aria-labelledby="testimonios-title"]',
+			-12,
+		);
+		parallax("#contacto > p.font-display", "#contacto", -12);
+
+		// Acento que se "dibuja" con el scroll (scrub) en el Lead.
+		const rule = document.querySelector(".scrub-rule");
+		const lead = document.querySelector(".lead");
+		if (rule && lead) {
+			gsap.fromTo(
+				rule,
+				{ scaleX: 0 },
+				{
+					scaleX: 1,
+					ease: "none",
+					transformOrigin: "left center",
+					scrollTrigger: {
+						trigger: lead,
+						start: "top top",
+						end: "bottom top",
+						scrub: true,
+					},
+				},
+			);
+		}
+
+		// Recalcular posiciones ahora y cuando las fuentes cambien alturas.
+		ScrollTrigger.refresh();
+		if (document.fonts && document.fonts.ready) {
+			document.fonts.ready.then(() => ScrollTrigger.refresh());
+		}
+	}
+
+	async function runAboutEntrance() {
+		const about = document.getElementById("about");
+		const black = document.getElementById("on-black");
+		const line = document.getElementById("on-line");
+		if (!about || !black || !line) return;
+
+		const reveals =
+			document.querySelectorAll<HTMLElement>(".about-reveal");
+		const showAll = () => {
+			black.style.opacity = "0";
+			line.style.opacity = "0";
+			reveals.forEach((el) => {
+				el.style.opacity = "";
+				el.style.transform = "";
+			});
+		};
+
+		const reduced = prefersReduced();
+
+		// Failsafe: en <1.8 s el contenido queda visible pase lo que pase.
+		const safety = window.setTimeout(showAll, 1800);
+
+		let introSeen = false;
+		try {
+			introSeen = sessionStorage.getItem("aboutIntroSeen") === "1";
+		} catch {}
+		// El encendido CRT sólo en 1ª visita, sin ancla y con movimiento permitido.
+		const playIntro = !reduced && !introSeen && currentHash().length <= 1;
+
+		try {
+			const { gsap } = await import("gsap");
+			const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+			gsap.registerPlugin(ScrollTrigger);
+			ScrollTriggerRef = ScrollTrigger;
+
+			if (playIntro) {
+				try {
+					sessionStorage.setItem("aboutIntroSeen", "1");
+				} catch {}
+				const tl = gsap.timeline({
+					onComplete: () => window.clearTimeout(safety),
+				});
+				tl.set("#on-line", { opacity: 1, scaleX: 0, scaleY: 0.0035 })
+					.to("#on-line", {
+						scaleX: 1,
+						duration: 0.28,
+						ease: "power3.out",
+					})
+					.to("#on-line", { scaleY: 1, duration: 0.32, ease: "expo.out" })
+					.to("#on-black", { opacity: 0, duration: 0.25 }, "-=0.12")
+					// Arranca el reveal al desvanecer el negro: lo visible solapa la
+					// salida del tubo, sin hueco en blanco.
+					.add(() => setupAboutScroll(gsap, ScrollTrigger, false), "<")
+					.to("#on-line", { opacity: 0, duration: 0.22 }, "<");
+			} else {
+				// Sin encendido (ancla, ya vista o reduce-motion): montamos triggers
+				// con el negro aún encima y luego lo retiramos, sin salto visible.
+				window.clearTimeout(safety);
+				setupAboutScroll(gsap, ScrollTrigger, reduced);
+				gsap.to([black, line], { opacity: 0, duration: 0.2 });
+			}
+		} catch {
+			window.clearTimeout(safety);
+			showAll();
+		}
+	}
+
+	// Astro no salta al ancla en navegación SPA, así que el scroll lo hacemos aquí.
+	function scrollToHash() {
+		const hash = currentHash();
+		if (hash.length < 2) return;
+		let el;
+		try {
+			el = document.querySelector(hash);
+		} catch {
+			return; // hash no es un selector válido
+		}
+		if (!el) return;
+
+		if (prefersReduced()) {
+			el.scrollIntoView({ block: "start" });
+			return;
+		}
+
+		// Arrancamos arriba y bajamos en suave, para que se note que hay contenido
+		// por encima en vez de aparecer clavados en la sección.
+		window.scrollTo(0, 0);
+		requestAnimationFrame(() =>
+			requestAnimationFrame(() =>
+				el.scrollIntoView({ behavior: "smooth", block: "start" }),
+			),
+		);
+	}
+
+	// Guardamos el hash de destino antes del swap (ver currentHash).
+	document.addEventListener("astro:before-preparation", (event) => {
+		const to = (event as Event & { to?: URL }).to;
+		pendingHash = to?.hash ?? "";
+	});
+
+	// Antes del swap SPA matamos los triggers de About para no dejar instancias
+	// apuntando a DOM que se va a eliminar.
+	document.addEventListener("astro:before-swap", () => {
+		ScrollTriggerRef?.getAll().forEach((t) => t.kill());
+	});
+
+	document.addEventListener("astro:page-load", () => {
+		bindHeroExit();
+		runHeroEntrance();
+		runAboutEntrance();
+		scrollToHash();
+		pendingHash = "";
+	});
+</script>
+
 <style>
 	html,
 	body {
+		background-color: #080808;
+		color: #ede6e0;
+		font-family: "Space Mono", ui-monospace, monospace;
 		margin: 0;
 		width: 100%;
-		height: 100%;
+		min-height: 100dvh;
+		overflow-x: hidden;
+	}
+
+	/* Fondo: retícula de puntos blancos en las intersecciones (papel
+	   cuadriculado sin las líneas, solo los vértices). */
+	body {
+		background-image: radial-gradient(
+			circle,
+			rgba(237, 230, 224, 0.16) 1px,
+			transparent 1.6px
+		);
+		background-size: 28px 28px;
 	}
 </style>

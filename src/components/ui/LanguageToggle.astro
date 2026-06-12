@@ -1,0 +1,64 @@
+---
+// Selector ES/EN: enlaza a la misma ruta en el otro idioma.
+import { LOCALES, LOCALE_LABELS, LOCALE_NAMES } from "@/i18n/config";
+import { getLangFromUrl, switchLocalePath } from "@/i18n/utils";
+
+interface Props {
+    class?: string;
+}
+const { class: className } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+---
+
+<nav class:list={["lang", className]} aria-label="Idioma / Language">
+    {
+        LOCALES.map((l) =>
+            l === lang ? (
+                <span class="lang__item lang__item--active" aria-current="true">
+                    {LOCALE_LABELS[l]}
+                </span>
+            ) : (
+                <a
+                    class="lang__item"
+                    href={switchLocalePath(Astro.url, l)}
+                    hreflang={l}
+                    lang={l}
+                    aria-label={LOCALE_NAMES[l]}
+                >
+                    {LOCALE_LABELS[l]}
+                </a>
+            ),
+        )
+    }
+</nav>
+
+<style>
+    .lang {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15rem;
+        font-family: var(--font-mono);
+        font-size: clamp(0.65rem, 0.6rem + 0.3vw, 0.78rem);
+        letter-spacing: 0.18em;
+    }
+    .lang__item {
+        padding: 0.25em 0.55em;
+        text-decoration: none;
+        color: var(--c-dim);
+        border: 1px solid transparent;
+        transition:
+            color 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease;
+    }
+    a.lang__item:hover,
+    a.lang__item:focus-visible {
+        color: var(--c-salmon);
+        border-color: var(--c-salmon);
+    }
+    .lang__item--active {
+        color: var(--c-bg);
+        background: var(--c-salmon);
+    }
+</style>
