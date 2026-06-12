@@ -4,6 +4,7 @@ import { LOCALES } from "@/i18n/config";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import CrtShell from "@/components/layout/CrtShell.astro";
+import ProjectFilters from "@/components/sections/project/ProjectFilters.astro";
 import ProjectList from "@/components/sections/about/ProjectList.astro";
 
 export const getStaticPaths = (() =>
@@ -39,6 +40,7 @@ const t = useTranslations(lang);
             </p>
         </section>
 
+        <ProjectFilters />
         <ProjectList />
     </CrtShell>
 </Layout>

@@ -11,10 +11,15 @@ const PROJECTS = getProjects(lang);
 
 <ul
     class="grid grid-cols-1 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-2 lg:grid-cols-3"
+    data-project-grid
 >
         {
             PROJECTS.map((p) => (
-                <li class="group relative flex flex-col gap-4 bg-bg p-6 transition-colors duration-300 hover:bg-[#111]">
+                <li
+                    class="group relative flex flex-col gap-4 bg-bg p-6 transition-colors duration-300 hover:bg-[#111]"
+                    data-project-card
+                    data-tags={p.tags.map((x) => x.toLowerCase()).join("|")}
+                >
                     <div class="flex items-baseline justify-between">
                         <span class="font-mono text-xs tracking-widest text-red">
                             {p.idx}

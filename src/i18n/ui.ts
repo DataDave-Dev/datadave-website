@@ -47,6 +47,11 @@ export const ui = {
         "projectsPage.kicker": "PERFIL / PROYECTOS",
         "projectsPage.intro":
             "Lo que he construido y a lo que contribuyo: aplicaciones de escritorio y web, automatizaciones y open source. Cada uno con su código o su demo.",
+        "projectsPage.filterLabel": "// FILTRAR POR TECNOLOGÍA",
+        "projectsPage.filterAll": "Todos",
+        "projectsPage.filterAria": "Filtrar proyectos por tecnología",
+        "projectsPage.countAria": "Proyectos mostrados",
+        "projectsPage.noResults": "Sin proyectos para este filtro.",
         "contactPage.channel": "// CH 05 — CONTACTO",
         "contactPage.kicker": "PERFIL / CONTACTO",
         "contactPage.intro":
@@ -190,6 +195,11 @@ export const ui = {
         "projectsPage.kicker": "PROFILE / PROJECTS",
         "projectsPage.intro":
             "What I've built and contribute to: desktop and web apps, automations and open source. Each with its code or live demo.",
+        "projectsPage.filterLabel": "// FILTER BY TECHNOLOGY",
+        "projectsPage.filterAll": "All",
+        "projectsPage.filterAria": "Filter projects by technology",
+        "projectsPage.countAria": "Projects shown",
+        "projectsPage.noResults": "No projects for this filter.",
         "contactPage.channel": "// CH 05 — CONTACT",
         "contactPage.kicker": "PROFILE / CONTACT",
         "contactPage.intro":
