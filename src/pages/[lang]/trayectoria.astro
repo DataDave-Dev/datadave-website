@@ -1,51 +1,103 @@
 ---
 import type { GetStaticPaths } from "astro";
 import { LOCALES } from "@/i18n/config";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import AboutTopbar from "@/components/sections/about/AboutTopbar.astro";
-import AboutLead from "@/components/sections/about/AboutLead.astro";
-import AboutBio from "@/components/sections/about/AboutBio.astro";
-import AboutSkills from "@/components/sections/about/AboutSkills.astro";
-import AboutWorkflow from "@/components/sections/about/AboutWorkflow.astro";
-import ProjectList from "@/components/sections/about/ProjectList.astro";
-import Testimonials from "@/components/sections/about/Testimonials.astro";
-import AboutContact from "@/components/sections/about/AboutContact.astro";
+import LanguageToggle from "@/components/ui/LanguageToggle.astro";
+import CareerTimeline from "@/components/sections/career/CareerTimeline.astro";
 import AboutTelemetry from "@/components/sections/about/AboutTelemetry.astro";
+import { getCareer } from "@/const/career";
+import { FULL_NAME } from "@/const/profile";
 
 export const getStaticPaths = (() =>
     LOCALES.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const career = getCareer(lang);
+const isEmpty =
+    !career.experience.length &&
+    !career.education.length &&
+    !career.achievements.length;
 ---
 
 <Layout
-    title={t("seo.aboutTitle")}
-    description={t("seo.aboutDesc")}
+    title={t("seo.careerTitle")}
+    description={t("seo.careerDesc")}
     type="profile"
 >
-    <main id="about" class="crt" aria-labelledby="about-title">
+    <main id="career" class="crt" aria-labelledby="career-title">
         <!-- Atmósfera analógica -->
         <div class="crt__grain" aria-hidden="true"></div>
         <div class="crt__scanlines" aria-hidden="true"></div>
         <div class="crt__vignette" aria-hidden="true"></div>
 
         <div class="frame">
-            <AboutTopbar />
-            <AboutLead />
-            <AboutBio />
-            <AboutSkills />
-            <AboutWorkflow />
-            <ProjectList />
-            <Testimonials />
-            <AboutContact />
+            <header
+                class="flex flex-wrap items-center justify-between gap-4 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-dim"
+            >
+                <a
+                    href={localizePath("/", lang)}
+                    class="border border-[#2a2a2a] px-3.5 py-2 text-salmon transition-colors duration-300 hover:bg-salmon hover:text-bg"
+                    >{t("nav.back")}</a
+                >
+                <span class="inline-flex items-center gap-4">
+                    <span>{t("career.channel")}</span>
+                    <LanguageToggle />
+                </span>
+            </header>
+
+            <section class="flex flex-col gap-4">
+                <p
+                    class="border-l-[3px] border-blood pl-3.5 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-dim"
+                >
+                    {t("career.kicker")}
+                </p>
+                <h1
+                    id="career-title"
+                    class="font-display text-6xl uppercase leading-[0.9] text-bone md:text-8xl"
+                >
+                    {t("career.title")}
+                </h1>
+                <p
+                    class="font-mono text-sm uppercase tracking-[0.25em] text-salmon"
+                >
+                    {FULL_NAME}
+                </p>
+                <p
+                    class="max-w-[60ch] font-body text-base leading-relaxed text-[#d6cfc9] md:text-lg"
+                >
+                    <span class="mr-2 text-red" aria-hidden="true">&gt;</span>
+                    {t("career.intro")}
+                </p>
+            </section>
+
+            <CareerTimeline
+                label={t("career.experienceLabel")}
+                entries={career.experience}
+                id="experiencia"
+            />
+            <CareerTimeline
+                label={t("career.educationLabel")}
+                entries={career.education}
+                id="formacion"
+            />
+            <CareerTimeline
+                label={t("career.certsLabel")}
+                entries={career.achievements}
+                id="logros"
+            />
+
+            {
+                isEmpty && (
+                    <p class="max-w-[48ch] border border-[#1c1c1c] bg-bg/40 p-6 font-mono text-sm leading-relaxed text-dim">
+                        {t("career.empty")}
+                    </p>
+                )
+            }
+
             <AboutTelemetry />
         </div>
-
-        <!-- Capas de encendido CRT -->
-        <div id="on-black" class="fx fx--black" aria-hidden="true"></div>
-        <div id="on-line" class="fx fx--line" aria-hidden="true"></div>
     </main>
 </Layout>
 
@@ -122,35 +174,9 @@ const t = useTranslations(lang);
         }
     }
 
-    /* ---------- Capas de encendido ---------- */
-    .fx {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        opacity: 0;
-        will-change: transform, opacity;
-    }
-    .fx--black {
-        z-index: 90;
-        background: #050505;
-        opacity: 0; /* sin JS no se tapa nada: el contenido queda visible */
-    }
-    /* Con JS, el overlay cubre hasta que el "encendido" de tubo lo retira. */
-    :global(html.js) .fx--black {
-        opacity: 1;
-    }
-    .fx--line {
-        z-index: 91;
-        background: #fff;
-        transform-origin: center center;
-    }
-
     @media (prefers-reduced-motion: reduce) {
         .crt__grain {
             animation: none;
-        }
-        .fx {
-            display: none;
         }
     }
 </style>

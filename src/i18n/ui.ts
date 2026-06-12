@@ -21,6 +21,27 @@ export const ui = {
         // ---- Telemetría (pie CRT, compartido) ----
         "telemetry.onAir": "EN EMISIÓN DESDE 2022",
 
+        // ---- Bottom-nav (isla) ----
+        "nav.ariaLabel": "Navegación principal",
+        "nav.home": "Inicio",
+        "nav.about": "Sobre mí",
+        "nav.career": "Trayectoria",
+        "nav.projects": "Proyectos",
+        "nav.contact": "Contacto",
+
+        // ---- Trayectoria ----
+        "career.channel": "// CH 03 — TRAYECTORIA",
+        "career.kicker": "PERFIL / TRAYECTORIA",
+        "career.title": "TRAYECTORIA",
+        "career.intro":
+            "Dónde he trabajado, qué he estudiado y lo que he construido por el camino. La versión cronológica del perfil.",
+        "career.experienceLabel": "// EXPERIENCIA",
+        "career.educationLabel": "// FORMACIÓN",
+        "career.certsLabel": "// CERTIFICACIONES & LOGROS",
+        "career.present": "Actualidad",
+        "career.empty":
+            "Esta sección está en construcción. Pronto, la trayectoria completa.",
+
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — SOBRE MÍ",
         "about.leadKicker": "PERFIL / DATADAVE",
@@ -106,6 +127,9 @@ export const ui = {
             "Desarrollador full-stack y de datos: aplicaciones, APIs, automatización y pipelines ETL.",
         "seo.breadcrumbHome": "Inicio",
         "seo.breadcrumbProjects": "Proyectos",
+        "seo.careerTitle": "Trayectoria · DataDave",
+        "seo.careerDesc":
+            "Trayectoria de DataDave: experiencia, formación y logros. La versión cronológica del perfil full-stack y de datos.",
     },
     en: {
         // ---- Navigation / common ----
@@ -122,6 +146,27 @@ export const ui = {
 
         // ---- Telemetry (CRT footer, shared) ----
         "telemetry.onAir": "ON AIR SINCE 2022",
+
+        // ---- Bottom-nav (island) ----
+        "nav.ariaLabel": "Main navigation",
+        "nav.home": "Home",
+        "nav.about": "About",
+        "nav.career": "Career",
+        "nav.projects": "Projects",
+        "nav.contact": "Contact",
+
+        // ---- Career ----
+        "career.channel": "// CH 03 — CAREER",
+        "career.kicker": "PROFILE / CAREER",
+        "career.title": "CAREER",
+        "career.intro":
+            "Where I've worked, what I've studied and what I've built along the way. The chronological version of the profile.",
+        "career.experienceLabel": "// EXPERIENCE",
+        "career.educationLabel": "// EDUCATION",
+        "career.certsLabel": "// CERTIFICATIONS & ACHIEVEMENTS",
+        "career.present": "Present",
+        "career.empty":
+            "This section is under construction. The full career, coming soon.",
 
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — ABOUT ME",
@@ -208,6 +253,9 @@ export const ui = {
             "Full-stack and data developer: applications, APIs, automation and ETL pipelines.",
         "seo.breadcrumbHome": "Home",
         "seo.breadcrumbProjects": "Projects",
+        "seo.careerTitle": "Career · DataDave",
+        "seo.careerDesc":
+            "DataDave's career: experience, education and achievements. The chronological version of the full-stack and data profile.",
     },
 } satisfies Record<Lang, Record<string, string>>;
 

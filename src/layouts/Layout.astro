@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
 import Seo from "@/components/seo/Seo.astro";
+import BottomNav from "@/components/ui/BottomNav.astro";
 import { LOCALES, HREFLANG, DEFAULT_LOCALE } from "@/i18n/config";
 import {
 	getLangFromUrl,
@@ -101,6 +102,7 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 	</head>
 	<body>
 		<slot />
+		<BottomNav />
 	</body>
 </html>
 

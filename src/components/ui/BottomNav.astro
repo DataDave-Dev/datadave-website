@@ -1,0 +1,158 @@
+---
+// Isla de navegación flotante (bottom-nav) estilo consola CRT. Global vía Layout.
+// El estado activo sale del primer tramo de la ruta; los anclas (#proyectos,
+// #contacto) son atajos a /about y no marcan activo.
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const path = Astro.url.pathname.replace(/\/$/, "");
+const homePath = localizePath("/", lang);
+const aboutPath = localizePath("/about", lang);
+const careerPath = localizePath("/trayectoria", lang);
+
+const isHome = path === homePath;
+const isAbout =
+    path === aboutPath || path.startsWith(`/${lang}/projects`);
+const isCareer = path === careerPath;
+
+const items = [
+    { href: homePath, label: t("nav.home"), current: isHome },
+    { href: aboutPath, label: t("nav.about"), current: isAbout },
+    { href: careerPath, label: t("nav.career"), current: isCareer },
+    { href: `${aboutPath}#proyectos`, label: t("nav.projects"), current: false },
+    { href: `${aboutPath}#contacto`, label: t("nav.contact"), current: false },
+];
+---
+
+<nav class="dock" aria-label={t("nav.ariaLabel")}>
+    <span class="dock__rail" aria-hidden="true"></span>
+    <ul class="dock__list">
+        {
+            items.map((it, i) => (
+                <li>
+                    <a
+                        href={it.href}
+                        class={`dock__item${it.current ? " is-active" : ""}`}
+                        aria-current={it.current ? "page" : undefined}
+                    >
+                        <span class="dock__idx" aria-hidden="true">
+                            {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span class="dock__label">{it.label}</span>
+                    </a>
+                </li>
+            ))
+        }
+    </ul>
+</nav>
+
+<style>
+    .dock {
+        position: fixed;
+        left: 50%;
+        bottom: clamp(0.6rem, 1.5vw, 1.25rem);
+        transform: translateX(-50%);
+        z-index: 80;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        max-width: calc(100vw - 1.5rem);
+    }
+    .dock__rail {
+        position: absolute;
+        inset: 0;
+        border: 1px solid #2a2a2a;
+        background: rgba(11, 11, 11, 0.82);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow:
+            0 18px 50px -20px rgba(0, 0, 0, 0.9),
+            0 0 0 1px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 74, 50, 0.18);
+        pointer-events: none;
+    }
+    .dock__list {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+        gap: 0.15rem;
+        margin: 0;
+        padding: 0.4rem 0.5rem;
+        list-style: none;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .dock__list::-webkit-scrollbar {
+        display: none;
+    }
+
+    .dock__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.15rem;
+        padding: 0.45rem 0.7rem;
+        font-family: var(--font-mono);
+        color: var(--c-dim);
+        text-decoration: none;
+        white-space: nowrap;
+        border: 1px solid transparent;
+        transition:
+            color 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease;
+    }
+    .dock__idx {
+        font-size: 0.55rem;
+        letter-spacing: 0.18em;
+        color: #57514c;
+        font-variant-numeric: tabular-nums;
+        transition: color 0.25s ease;
+    }
+    .dock__label {
+        font-size: 0.66rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .dock__item:hover,
+    .dock__item:focus-visible {
+        color: var(--c-bone);
+        border-color: #333;
+        background: rgba(255, 74, 50, 0.06);
+    }
+    .dock__item:hover .dock__idx,
+    .dock__item:focus-visible .dock__idx {
+        color: var(--c-salmon);
+    }
+    .dock__item:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 2px;
+    }
+
+    .dock__item.is-active {
+        color: var(--c-salmon);
+        border-color: rgba(226, 163, 153, 0.4);
+        background: rgba(226, 163, 153, 0.08);
+    }
+    .dock__item.is-active .dock__idx {
+        color: var(--c-ember);
+    }
+
+    @media (max-width: 460px) {
+        .dock__item {
+            padding: 0.4rem 0.55rem;
+        }
+        .dock__label {
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .dock__item,
+        .dock__idx {
+            transition: none;
+        }
+    }
+</style>

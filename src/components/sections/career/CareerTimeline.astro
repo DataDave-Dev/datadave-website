@@ -1,0 +1,81 @@
+---
+// Timeline vertical reutilizable para Trayectoria. Recibe una etiqueta y una lista
+// de entradas; si la lista está vacía, no pinta nada. Estilo CRT con Tailwind.
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import type { TimelineEntry } from "@/const/career";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+interface Props {
+    label: string;
+    entries: TimelineEntry[];
+    id?: string;
+}
+const { label, entries, id } = Astro.props;
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+{
+    entries.length > 0 && (
+        <section class="about-reveal" id={id} aria-labelledby={`${id}-title`}>
+            <SectionLabel id={`${id}-title`}>{label}</SectionLabel>
+
+            <ol class="relative ml-1 border-l border-[#262626]">
+                {entries.map((e) => (
+                    <li class="relative pb-9 pl-6 last:pb-0 sm:pl-8">
+                        {/* Marcador sobre la línea */}
+                        <span
+                            class="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border border-ember bg-bg shadow-[0_0_10px_-1px_rgba(255,74,50,0.8)]"
+                            aria-hidden="true"
+                        />
+
+                        <p class="mb-1 font-mono text-[0.72rem] uppercase tracking-[0.18em] text-salmon">
+                            {e.start}
+                            {" — "}
+                            {e.end ?? t("career.present")}
+                        </p>
+
+                        <h3 class="font-display text-2xl uppercase leading-none text-bone md:text-3xl">
+                            {e.title}
+                        </h3>
+
+                        {(e.org || e.location) && (
+                            <p class="mt-1.5 font-mono text-[0.78rem] uppercase tracking-[0.12em] text-dim">
+                                {e.org}
+                                {e.org && e.location ? " · " : ""}
+                                {e.location}
+                            </p>
+                        )}
+
+                        {e.summary && (
+                            <p class="mt-3 max-w-[60ch] font-body text-sm leading-relaxed text-[#cfc9c4] md:text-base">
+                                {e.summary}
+                            </p>
+                        )}
+
+                        {e.bullets && e.bullets.length > 0 && (
+                            <ul class="mt-3 flex flex-col gap-1.5">
+                                {e.bullets.map((b) => (
+                                    <li class="relative max-w-[60ch] pl-4 font-body text-sm leading-relaxed text-[#cfc9c4] before:absolute before:left-0 before:text-ember before:content-['>']">
+                                        {b}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
+                        {e.link && (
+                            <a
+                                href={e.link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="mt-3 inline-block font-mono text-[0.74rem] uppercase tracking-[0.14em] text-bone underline decoration-[#3a3a3a] underline-offset-4 transition-colors duration-200 hover:text-salmon hover:decoration-salmon"
+                            >
+                                {e.link.label}
+                            </a>
+                        )}
+                    </li>
+                ))}
+            </ol>
+        </section>
+    )
+}
