@@ -1,11 +1,10 @@
 ---
 import type { GetStaticPaths } from "astro";
 import { LOCALES } from "@/i18n/config";
-import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import LanguageToggle from "@/components/ui/LanguageToggle.astro";
+import CrtShell from "@/components/layout/CrtShell.astro";
 import CareerTimeline from "@/components/sections/career/CareerTimeline.astro";
-import AboutTelemetry from "@/components/sections/about/AboutTelemetry.astro";
 import { getCareer } from "@/const/career";
 import { FULL_NAME } from "@/const/profile";
 
@@ -26,157 +25,56 @@ const isEmpty =
     description={t("seo.careerDesc")}
     type="profile"
 >
-    <main id="career" class="crt" aria-labelledby="career-title">
-        <!-- Atmósfera analógica -->
-        <div class="crt__grain" aria-hidden="true"></div>
-        <div class="crt__scanlines" aria-hidden="true"></div>
-        <div class="crt__vignette" aria-hidden="true"></div>
-
-        <div class="frame">
-            <header
-                class="flex flex-wrap items-center justify-between gap-4 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-dim"
+    <CrtShell
+        mainId="career"
+        channel={t("career.channel")}
+        labelledby="career-title"
+    >
+        <section class="flex flex-col gap-4">
+            <p
+                class="border-l-[3px] border-blood pl-3.5 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-dim"
             >
-                <a
-                    href={localizePath("/", lang)}
-                    class="border border-[#2a2a2a] px-3.5 py-2 text-salmon transition-colors duration-300 hover:bg-salmon hover:text-bg"
-                    >{t("nav.back")}</a
-                >
-                <span class="inline-flex items-center gap-4">
-                    <span>{t("career.channel")}</span>
-                    <LanguageToggle />
-                </span>
-            </header>
+                {t("career.kicker")}
+            </p>
+            <h1
+                id="career-title"
+                class="font-display text-6xl uppercase leading-[0.9] text-bone md:text-8xl"
+            >
+                {t("career.title")}
+            </h1>
+            <p class="font-mono text-sm uppercase tracking-[0.25em] text-salmon">
+                {FULL_NAME}
+            </p>
+            <p
+                class="max-w-[60ch] font-body text-base leading-relaxed text-[#d6cfc9] md:text-lg"
+            >
+                <span class="mr-2 text-red" aria-hidden="true">&gt;</span>
+                {t("career.intro")}
+            </p>
+        </section>
 
-            <section class="flex flex-col gap-4">
-                <p
-                    class="border-l-[3px] border-blood pl-3.5 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-dim"
-                >
-                    {t("career.kicker")}
+        <CareerTimeline
+            label={t("career.experienceLabel")}
+            entries={career.experience}
+            id="experiencia"
+        />
+        <CareerTimeline
+            label={t("career.educationLabel")}
+            entries={career.education}
+            id="formacion"
+        />
+        <CareerTimeline
+            label={t("career.certsLabel")}
+            entries={career.achievements}
+            id="logros"
+        />
+
+        {
+            isEmpty && (
+                <p class="max-w-[48ch] border border-[#1c1c1c] bg-bg/40 p-6 font-mono text-sm leading-relaxed text-dim">
+                    {t("career.empty")}
                 </p>
-                <h1
-                    id="career-title"
-                    class="font-display text-6xl uppercase leading-[0.9] text-bone md:text-8xl"
-                >
-                    {t("career.title")}
-                </h1>
-                <p
-                    class="font-mono text-sm uppercase tracking-[0.25em] text-salmon"
-                >
-                    {FULL_NAME}
-                </p>
-                <p
-                    class="max-w-[60ch] font-body text-base leading-relaxed text-[#d6cfc9] md:text-lg"
-                >
-                    <span class="mr-2 text-red" aria-hidden="true">&gt;</span>
-                    {t("career.intro")}
-                </p>
-            </section>
-
-            <CareerTimeline
-                label={t("career.experienceLabel")}
-                entries={career.experience}
-                id="experiencia"
-            />
-            <CareerTimeline
-                label={t("career.educationLabel")}
-                entries={career.education}
-                id="formacion"
-            />
-            <CareerTimeline
-                label={t("career.certsLabel")}
-                entries={career.achievements}
-                id="logros"
-            />
-
-            {
-                isEmpty && (
-                    <p class="max-w-[48ch] border border-[#1c1c1c] bg-bg/40 p-6 font-mono text-sm leading-relaxed text-dim">
-                        {t("career.empty")}
-                    </p>
-                )
-            }
-
-            <AboutTelemetry />
-        </div>
-    </main>
+            )
+        }
+    </CrtShell>
 </Layout>
-
-<style>
-    .crt {
-        position: relative;
-        isolation: isolate;
-        min-height: 100svh;
-        width: 100%;
-        background: transparent;
-        color: var(--c-bone);
-        overflow: hidden;
-    }
-
-    .frame {
-        position: relative;
-        z-index: 4;
-        max-width: 72rem;
-        margin-inline: auto;
-        padding: clamp(1.5rem, 1rem + 3vw, 4rem)
-            clamp(1.25rem, 1rem + 4vw, 4rem);
-        /* Holgura inferior para que la isla de navegación no tape el pie. */
-        padding-bottom: clamp(6rem, 5rem + 4vw, 8rem);
-        display: flex;
-        flex-direction: column;
-        gap: clamp(2rem, 1.5rem + 3vw, 4rem);
-    }
-
-    /* ---------- Capas CRT compartidas ---------- */
-    .crt__scanlines {
-        position: absolute;
-        inset: 0;
-        z-index: 5;
-        pointer-events: none;
-        background: repeating-linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, 0) 0,
-            rgba(0, 0, 0, 0) 2px,
-            rgba(0, 0, 0, 0.22) 3px,
-            rgba(0, 0, 0, 0.22) 4px
-        );
-        mix-blend-mode: multiply;
-    }
-    .crt__vignette {
-        position: absolute;
-        inset: 0;
-        z-index: 3;
-        pointer-events: none;
-        background: radial-gradient(
-            120% 100% at 50% 30%,
-            rgba(153, 0, 0, 0.07) 0%,
-            rgba(8, 8, 8, 0) 45%,
-            rgba(8, 8, 8, 0.8) 100%
-        );
-    }
-    .crt__grain {
-        position: absolute;
-        inset: -50%;
-        z-index: 2;
-        pointer-events: none;
-        opacity: 0.4;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        animation: grain 0.7s steps(4) infinite;
-    }
-    @keyframes grain {
-        0% {
-            transform: translate(0, 0);
-        }
-        50% {
-            transform: translate(2%, -2%);
-        }
-        100% {
-            transform: translate(-2%, 2%);
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .crt__grain {
-            animation: none;
-        }
-    }
-</style>

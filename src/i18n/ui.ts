@@ -42,6 +42,16 @@ export const ui = {
         "career.empty":
             "Esta sección está en construcción. Pronto, la trayectoria completa.",
 
+        // ---- Páginas Proyectos y Contacto ----
+        "projectsPage.channel": "// CH 04 — PROYECTOS",
+        "projectsPage.kicker": "PERFIL / PROYECTOS",
+        "projectsPage.intro":
+            "Lo que he construido y a lo que contribuyo: aplicaciones de escritorio y web, automatizaciones y open source. Cada uno con su código o su demo.",
+        "contactPage.channel": "// CH 05 — CONTACTO",
+        "contactPage.kicker": "PERFIL / CONTACTO",
+        "contactPage.intro":
+            "¿Una idea, un proyecto o una vacante en mente? Hablemos.",
+
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — SOBRE MÍ",
         "about.leadKicker": "PERFIL / DATADAVE",
@@ -114,6 +124,7 @@ export const ui = {
         "cta.head2": "lo construí?",
         "cta.talk": "Hablemos",
         "cta.backAbout": "← Volver a sobre mí",
+        "cta.backProjects": "← Volver a proyectos",
 
         // ---- SEO ----
         "seo.defaultTitle": "DataDave · Desarrollador de software y datos",
@@ -130,6 +141,12 @@ export const ui = {
         "seo.careerTitle": "Trayectoria · DataDave",
         "seo.careerDesc":
             "Trayectoria de DataDave: experiencia, formación y logros. La versión cronológica del perfil full-stack y de datos.",
+        "seo.projectsTitle": "Proyectos · DataDave",
+        "seo.projectsDesc":
+            "Proyectos de DataDave: aplicaciones de escritorio y web, automatizaciones y contribuciones open source, con código y demos verificables.",
+        "seo.contactTitle": "Contacto · DataDave",
+        "seo.contactDesc":
+            "Ponte en contacto con DataDave: correo, GitHub y LinkedIn.",
     },
     en: {
         // ---- Navigation / common ----
@@ -167,6 +184,16 @@ export const ui = {
         "career.present": "Present",
         "career.empty":
             "This section is under construction. The full career, coming soon.",
+
+        // ---- Projects and Contact pages ----
+        "projectsPage.channel": "// CH 04 — PROJECTS",
+        "projectsPage.kicker": "PROFILE / PROJECTS",
+        "projectsPage.intro":
+            "What I've built and contribute to: desktop and web apps, automations and open source. Each with its code or live demo.",
+        "contactPage.channel": "// CH 05 — CONTACT",
+        "contactPage.kicker": "PROFILE / CONTACT",
+        "contactPage.intro":
+            "An idea, a project or a role in mind? Let's talk.",
 
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — ABOUT ME",
@@ -240,6 +267,7 @@ export const ui = {
         "cta.head2": "I built it?",
         "cta.talk": "Let's talk",
         "cta.backAbout": "← Back to about",
+        "cta.backProjects": "← Back to projects",
 
         // ---- SEO ----
         "seo.defaultTitle": "DataDave · Software & data developer",
@@ -256,6 +284,12 @@ export const ui = {
         "seo.careerTitle": "Career · DataDave",
         "seo.careerDesc":
             "DataDave's career: experience, education and achievements. The chronological version of the full-stack and data profile.",
+        "seo.projectsTitle": "Projects · DataDave",
+        "seo.projectsDesc":
+            "DataDave's projects: desktop and web apps, automations and open-source contributions, with verifiable code and demos.",
+        "seo.contactTitle": "Contact · DataDave",
+        "seo.contactDesc":
+            "Get in touch with DataDave: email, GitHub and LinkedIn.",
     },
 } satisfies Record<Lang, Record<string, string>>;
 

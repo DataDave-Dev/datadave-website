@@ -43,7 +43,7 @@ const CAREER_CONTENT: Record<Lang, CareerContent> = {
             {
                 title: "Contribución mergeada a La Velada V",
                 org: "Proyecto open source de midudev",
-                start: "2026",
+                start: "2025",
                 summary:
                     "Una propuesta de interfaz y animación (partículas de hover y selección de luchador al estilo Mario Kart) pasó la revisión del proyecto y fue mergeada.",
                 link: {
@@ -60,7 +60,7 @@ const CAREER_CONTENT: Record<Lang, CareerContent> = {
             {
                 title: "Merged contribution to La Velada V",
                 org: "Open-source project by midudev",
-                start: "2026",
+                start: "2025",
                 summary:
                     "A UI and animation proposal (hover particles and a Mario Kart-style fighter selection) passed the project's review and was merged.",
                 link: {

@@ -1,0 +1,48 @@
+---
+import type { GetStaticPaths } from "astro";
+import { LOCALES } from "@/i18n/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import CrtShell from "@/components/layout/CrtShell.astro";
+import AboutContact from "@/components/sections/about/AboutContact.astro";
+
+export const getStaticPaths = (() =>
+    LOCALES.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout
+    title={t("seo.contactTitle")}
+    description={t("seo.contactDesc")}
+    type="profile"
+>
+    <CrtShell
+        mainId="contact"
+        channel={t("contactPage.channel")}
+        labelledby="contact-title"
+    >
+        <section class="flex flex-col gap-4">
+            <p
+                class="border-l-[3px] border-blood pl-3.5 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-dim"
+            >
+                {t("contactPage.kicker")}
+            </p>
+            <h1
+                id="contact-title"
+                class="font-display text-6xl uppercase leading-[0.9] text-bone md:text-8xl"
+            >
+                {t("nav.contact")}
+            </h1>
+            <p
+                class="max-w-[60ch] font-body text-base leading-relaxed text-[#d6cfc9] md:text-lg"
+            >
+                <span class="mr-2 text-red" aria-hidden="true">&gt;</span>
+                {t("contactPage.intro")}
+            </p>
+        </section>
+
+        <AboutContact />
+    </CrtShell>
+</Layout>

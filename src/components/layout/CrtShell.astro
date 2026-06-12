@@ -1,49 +1,48 @@
 ---
-import type { GetStaticPaths } from "astro";
-import { LOCALES } from "@/i18n/config";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import Layout from "@/layouts/Layout.astro";
-import AboutTopbar from "@/components/sections/about/AboutTopbar.astro";
-import AboutLead from "@/components/sections/about/AboutLead.astro";
-import AboutBio from "@/components/sections/about/AboutBio.astro";
-import AboutSkills from "@/components/sections/about/AboutSkills.astro";
-import AboutWorkflow from "@/components/sections/about/AboutWorkflow.astro";
-import Testimonials from "@/components/sections/about/Testimonials.astro";
+// Shell CRT reutilizable para páginas internas (trayectoria, proyectos, contacto).
+// Aporta la atmósfera analógica, la barra superior (volver + canal + idioma), el
+// marco con holgura para la isla de navegación y el pie de telemetría.
+import LanguageToggle from "@/components/ui/LanguageToggle.astro";
 import AboutTelemetry from "@/components/sections/about/AboutTelemetry.astro";
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
 
-export const getStaticPaths = (() =>
-    LOCALES.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+interface Props {
+    mainId: string;
+    channel: string; // "// CH 0X — TÍTULO"
+    labelledby?: string; // id del h1 de la página
+}
+const { mainId, channel, labelledby } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<Layout
-    title={t("seo.aboutTitle")}
-    description={t("seo.aboutDesc")}
-    type="profile"
->
-    <main id="about" class="crt" aria-labelledby="about-title">
-        <!-- Atmósfera analógica -->
-        <div class="crt__grain" aria-hidden="true"></div>
-        <div class="crt__scanlines" aria-hidden="true"></div>
-        <div class="crt__vignette" aria-hidden="true"></div>
+<main id={mainId} class="crt" aria-labelledby={labelledby}>
+    <!-- Atmósfera analógica -->
+    <div class="crt__grain" aria-hidden="true"></div>
+    <div class="crt__scanlines" aria-hidden="true"></div>
+    <div class="crt__vignette" aria-hidden="true"></div>
 
-        <div class="frame">
-            <AboutTopbar />
-            <AboutLead />
-            <AboutBio />
-            <AboutSkills />
-            <AboutWorkflow />
-            <Testimonials />
-            <AboutTelemetry />
-        </div>
+    <div class="frame">
+        <header
+            class="flex flex-wrap items-center justify-between gap-4 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-dim"
+        >
+            <a
+                href={localizePath("/", lang)}
+                class="border border-[#2a2a2a] px-3.5 py-2 text-salmon transition-colors duration-300 hover:bg-salmon hover:text-bg"
+                >{t("nav.back")}</a
+            >
+            <span class="inline-flex items-center gap-4">
+                <span>{channel}</span>
+                <LanguageToggle />
+            </span>
+        </header>
 
-        <!-- Capas de encendido CRT -->
-        <div id="on-black" class="fx fx--black" aria-hidden="true"></div>
-        <div id="on-line" class="fx fx--line" aria-hidden="true"></div>
-    </main>
-</Layout>
+        <slot />
+
+        <AboutTelemetry />
+    </div>
+</main>
 
 <style>
     .crt {
@@ -118,35 +117,9 @@ const t = useTranslations(lang);
         }
     }
 
-    /* ---------- Capas de encendido ---------- */
-    .fx {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        opacity: 0;
-        will-change: transform, opacity;
-    }
-    .fx--black {
-        z-index: 90;
-        background: #050505;
-        opacity: 0; /* sin JS no se tapa nada: el contenido queda visible */
-    }
-    /* Con JS, el overlay cubre hasta que el "encendido" de tubo lo retira. */
-    :global(html.js) .fx--black {
-        opacity: 1;
-    }
-    .fx--line {
-        z-index: 91;
-        background: #fff;
-        transform-origin: center center;
-    }
-
     @media (prefers-reduced-motion: reduce) {
         .crt__grain {
             animation: none;
-        }
-        .fx {
-            display: none;
         }
     }
 </style>

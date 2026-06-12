@@ -9,21 +9,9 @@ const t = useTranslations(lang);
 const PROJECTS = getProjects(lang);
 ---
 
-<section
-    id="proyectos"
-    class="scroll-mt-24 about-reveal"
-    aria-labelledby="proyectos-title"
+<ul
+    class="grid grid-cols-1 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-2 lg:grid-cols-3"
 >
-    <h2
-        class="mb-6 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-ember"
-        id="proyectos-title"
-    >
-        {t("about.projectsLabel")}
-    </h2>
-
-    <ul
-        class="grid grid-cols-1 gap-px border border-[#1c1c1c] bg-[#1c1c1c] md:grid-cols-2 lg:grid-cols-3"
-    >
         {
             PROJECTS.map((p) => (
                 <li class="group relative flex flex-col gap-4 bg-bg p-6 transition-colors duration-300 hover:bg-[#111]">
@@ -55,9 +43,9 @@ const PROJECTS = getProjects(lang);
                         </div>
                     </div>
 
-                    <h3 class="font-display text-2xl uppercase leading-none text-bone">
+                    <h2 class="font-display text-2xl uppercase leading-none text-bone">
                         {p.name}
-                    </h3>
+                    </h2>
 
                     <p class="font-body text-sm leading-relaxed text-[#cfc9c4]">
                         {p.desc}
@@ -80,4 +68,3 @@ const PROJECTS = getProjects(lang);
             ))
         }
     </ul>
-</section>

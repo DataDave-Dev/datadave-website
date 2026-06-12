@@ -1,0 +1,44 @@
+---
+import type { GetStaticPaths } from "astro";
+import { LOCALES } from "@/i18n/config";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import CrtShell from "@/components/layout/CrtShell.astro";
+import ProjectList from "@/components/sections/about/ProjectList.astro";
+
+export const getStaticPaths = (() =>
+    LOCALES.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout title={t("seo.projectsTitle")} description={t("seo.projectsDesc")}>
+    <CrtShell
+        mainId="projects"
+        channel={t("projectsPage.channel")}
+        labelledby="projects-title"
+    >
+        <section class="flex flex-col gap-4">
+            <p
+                class="border-l-[3px] border-blood pl-3.5 font-mono text-[0.78rem] font-medium uppercase tracking-[0.25em] text-dim"
+            >
+                {t("projectsPage.kicker")}
+            </p>
+            <h1
+                id="projects-title"
+                class="font-display text-6xl uppercase leading-[0.9] text-bone md:text-8xl"
+            >
+                {t("nav.projects")}
+            </h1>
+            <p
+                class="max-w-[60ch] font-body text-base leading-relaxed text-[#d6cfc9] md:text-lg"
+            >
+                <span class="mr-2 text-red" aria-hidden="true">&gt;</span>
+                {t("projectsPage.intro")}
+            </p>
+        </section>
+
+        <ProjectList />
+    </CrtShell>
+</Layout>

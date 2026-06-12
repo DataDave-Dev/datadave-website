@@ -11,18 +11,23 @@ const path = Astro.url.pathname.replace(/\/$/, "");
 const homePath = localizePath("/", lang);
 const aboutPath = localizePath("/about", lang);
 const careerPath = localizePath("/trayectoria", lang);
+const projectsPath = localizePath("/projects", lang);
+const contactPath = localizePath("/contacto", lang);
 
 const isHome = path === homePath;
-const isAbout =
-    path === aboutPath || path.startsWith(`/${lang}/projects`);
+const isAbout = path === aboutPath;
 const isCareer = path === careerPath;
+// La página índice y las de detalle (/projects/<slug>) marcan "Proyectos".
+const isProjects =
+    path === projectsPath || path.startsWith(`/${lang}/projects/`);
+const isContact = path === contactPath;
 
 const items = [
     { href: homePath, label: t("nav.home"), current: isHome },
     { href: aboutPath, label: t("nav.about"), current: isAbout },
     { href: careerPath, label: t("nav.career"), current: isCareer },
-    { href: `${aboutPath}#proyectos`, label: t("nav.projects"), current: false },
-    { href: `${aboutPath}#contacto`, label: t("nav.contact"), current: false },
+    { href: projectsPath, label: t("nav.projects"), current: isProjects },
+    { href: contactPath, label: t("nav.contact"), current: isContact },
 ];
 ---
 
