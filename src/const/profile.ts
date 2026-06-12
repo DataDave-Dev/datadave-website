@@ -39,7 +39,7 @@ export const CONTACT: Contact = {
 const PROFILE_CONTENT: Record<Lang, ProfileContent> = {
     es: {
         specs: [
-            { k: "ROL", v: "Programador · Data Analyst" },
+            { k: "ROL", v: "Desarrollador full-stack · Data Analyst" },
             {
                 k: "STACK",
                 v: "Python · SQL · Node · Next.js · React · Astro · Linux",
@@ -61,7 +61,7 @@ const PROFILE_CONTENT: Record<Lang, ProfileContent> = {
             {
                 k: "VELOCIDAD",
                 t: "Entrego más, antes",
-                d: "Prototipo, refactorizo y automatizo lo repetitivo con IA. Lo que antes tomaba días, lo cierro en horas — sin sacrificar control.",
+                d: "Prototipo, refactorizo y automatizo lo repetitivo con IA. Cierro antes la parte mecánica y dedico el tiempo ganado a las decisiones que importan — sin sacrificar control.",
             },
             {
                 k: "CALIDAD",
@@ -77,7 +77,7 @@ const PROFILE_CONTENT: Record<Lang, ProfileContent> = {
     },
     en: {
         specs: [
-            { k: "ROLE", v: "Developer · Data Analyst" },
+            { k: "ROLE", v: "Full-stack developer · Data Analyst" },
             {
                 k: "STACK",
                 v: "Python · SQL · Node · Next.js · React · Astro · Linux",
@@ -99,7 +99,7 @@ const PROFILE_CONTENT: Record<Lang, ProfileContent> = {
             {
                 k: "SPEED",
                 t: "I ship more, sooner",
-                d: "I prototype, refactor and automate the repetitive parts with AI. What used to take days, I now close in hours — without giving up control.",
+                d: "I prototype, refactor and automate the repetitive parts with AI. I close the mechanical work sooner and spend the time I save on the decisions that matter — without giving up control.",
             },
             {
                 k: "QUALITY",

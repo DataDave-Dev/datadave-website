@@ -33,7 +33,7 @@ export const ui = {
         "about.history1":
             "Empecé escribiendo código para resolver mis propios problemas y terminé construyendo software de punta a punta: aplicaciones, APIs, automatizaciones y la infraestructura de datos que las alimenta.",
         "about.history2":
-            "Creo en lo analógico: entender el problema antes de escribir una sola línea, en código que se lee como prosa y en sistemas que dicen la verdad aunque incomode. Si se puede automatizar, ya lo automaticé.",
+            "Creo en lo analógico: entender el problema antes de escribir una sola línea, en código que se lee como prosa y en sistemas que dicen la verdad aunque incomode. Y si una tarea se repite, busco la forma de automatizarla.",
         "about.specLabel": "// FICHA",
         "about.specAria": "Ficha técnica",
 
@@ -135,7 +135,7 @@ export const ui = {
         "about.history1":
             "I started writing code to solve my own problems and ended up building software end to end: applications, APIs, automations and the data infrastructure that feeds them.",
         "about.history2":
-            "I believe in the analog approach: understanding the problem before writing a single line, in code that reads like prose, and in systems that tell the truth even when it's inconvenient. If it can be automated, I've already automated it.",
+            "I believe in the analog approach: understanding the problem before writing a single line, in code that reads like prose, and in systems that tell the truth even when it's inconvenient. And if a task repeats, I find a way to automate it.",
         "about.specLabel": "// SPEC SHEET",
         "about.specAria": "Spec sheet",
 
