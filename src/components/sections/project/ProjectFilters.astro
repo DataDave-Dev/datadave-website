@@ -1,100 +1,212 @@
 ---
-// Filtros por tecnología para la página de Proyectos. Calcula los tags únicos
-// (con su frecuencia) y filtra en cliente las tarjetas [data-project-card] por su
-// atributo data-tags. Selección única + "Todos". Se reinicia en astro:page-load.
+// Panel de filtros (consola) para la página de Proyectos. Dos facetas:
+// Categoría (dominio) y Tecnología (stack), ambas multiselección. Filtra en
+// cliente las tarjetas [data-project-card] por data-categories y data-tags:
+// match = (sin categoría sel. O intersecta) Y (sin tech sel. O intersecta).
+// Se reinicia en astro:page-load.
 import { getProjects } from "@/const/projects";
+import { projectId } from "@/const/projectId";
+import { categoriesOf, CATEGORY_ORDER } from "@/const/projectTaxonomy";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import type { UIKey } from "@/i18n/ui";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const PROJECTS = getProjects(lang);
+const total = PROJECTS.length;
 
-const counts = new Map<string, number>();
+// Categorías presentes, con su conteo.
+const catCounts = new Map<string, number>();
 for (const p of PROJECTS) {
-    for (const tag of p.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    for (const c of categoriesOf(projectId(p))) {
+        catCounts.set(c, (catCounts.get(c) ?? 0) + 1);
+    }
 }
-// Más usados primero; a igualdad, alfabético.
-const tags = [...counts.entries()]
+const categories = CATEGORY_ORDER.filter((k) => (catCounts.get(k) ?? 0) > 0).map(
+    (k) => ({
+        key: k,
+        label: t(`filter.cat.${k}` as UIKey),
+        count: catCounts.get(k) ?? 0,
+    }),
+);
+
+// Tags únicos, más usados primero.
+const tagCounts = new Map<string, number>();
+for (const p of PROJECTS) {
+    for (const tag of p.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+}
+const tags = [...tagCounts.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([tag]) => tag);
-const total = PROJECTS.length;
 ---
 
-<div class="filters" data-filters>
-    <p class="filters__label">{t("projectsPage.filterLabel")}</p>
-
-    <div class="filters__bar">
-        <div
-            class="filters__row"
-            role="group"
-            aria-label={t("projectsPage.filterAria")}
-        >
-            <button
-                type="button"
-                class="chip is-active"
-                data-filter="all"
-                aria-pressed="true">{t("projectsPage.filterAll")}</button
-            >
-            {
-                tags.map((tag) => (
-                    <button
-                        type="button"
-                        class="chip"
-                        data-filter={tag.toLowerCase()}
-                        aria-pressed="false"
-                    >
-                        {tag}
-                    </button>
-                ))
-            }
-        </div>
-
-        <p
-            class="filters__count"
+<div class="fconsole" data-filters>
+    <div class="fconsole__bar">
+        <span class="fconsole__title">{t("filter.title")}</span>
+        <span
+            class="fconsole__readout"
             aria-live="polite"
             aria-label={t("projectsPage.countAria")}
         >
-            <span class="filters__num" data-count>{total}</span>
-            <span class="filters__sep">/</span>
-            <span class="filters__total">{total}</span>
-        </p>
+            <span class="fconsole__brk" aria-hidden="true">[</span>
+            <span class="fconsole__num" data-count>{total}</span>
+            <span class="fconsole__sep" aria-hidden="true">/</span>
+            <span>{total}</span>
+            <span class="fconsole__rlabel">{t("filter.results")}</span>
+            <span class="fconsole__brk" aria-hidden="true">]</span>
+        </span>
     </div>
 
-    <p class="filters__empty" data-no-results hidden>
+    <div class="fconsole__body" role="group" aria-label={t("filter.groupAria")}>
+        <div class="facet">
+            <span class="facet__label">{t("filter.catLabel")}</span>
+            <div class="facet__chips">
+                {
+                    categories.map((c) => (
+                        <button
+                            type="button"
+                            class="chip chip--cat"
+                            data-facet="cat"
+                            data-value={c.key}
+                            aria-pressed="false"
+                        >
+                            {c.label}
+                            <span class="chip__n">{c.count}</span>
+                        </button>
+                    ))
+                }
+            </div>
+        </div>
+
+        <div class="facet">
+            <span class="facet__label">{t("filter.techLabel")}</span>
+            <div class="facet__chips">
+                {
+                    tags.map((tag) => (
+                        <button
+                            type="button"
+                            class="chip"
+                            data-facet="tech"
+                            data-value={tag.toLowerCase()}
+                            aria-pressed="false"
+                        >
+                            {tag}
+                        </button>
+                    ))
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="fconsole__foot">
+        <button type="button" class="fconsole__clear" data-clear disabled>
+            {t("filter.clear")} <span aria-hidden="true">✕</span>
+        </button>
+    </div>
+
+    <p class="fconsole__empty" data-no-results hidden>
         {t("projectsPage.noResults")}
     </p>
 </div>
 
 <style>
-    .filters {
+    .fconsole {
+        position: relative;
+        border: 1px solid #242424;
+        background:
+            linear-gradient(180deg, rgba(255, 74, 50, 0.035), transparent 42%),
+            rgba(13, 13, 13, 0.5);
+        padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 1.25rem;
     }
-    .filters__label {
-        margin: 0;
+    /* Hairline de fósforo arriba (acento de equipo). */
+    .fconsole::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -1px;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 74, 50, 0.5),
+            transparent
+        );
+        pointer-events: none;
+    }
+
+    .fconsole__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #1c1c1c;
+        padding-bottom: 0.9rem;
         font-family: var(--font-mono);
+    }
+    .fconsole__title {
         font-size: 0.78rem;
-        font-weight: 500;
         letter-spacing: 0.25em;
         text-transform: uppercase;
         color: var(--c-ember);
     }
-    .filters__bar {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 1rem;
-        flex-wrap: wrap;
+    .fconsole__readout {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4em;
+        font-size: 0.76rem;
+        letter-spacing: 0.12em;
+        color: var(--c-dim);
+        text-transform: uppercase;
+        font-variant-numeric: tabular-nums;
     }
-    .filters__row {
+    .fconsole__brk {
+        color: #4a4540;
+    }
+    .fconsole__num {
+        color: var(--c-salmon);
+    }
+    .fconsole__sep {
+        opacity: 0.5;
+    }
+    .fconsole__rlabel {
+        margin-left: 0.2em;
+    }
+
+    .fconsole__body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+    }
+    .facet {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .facet__label {
+        font-family: var(--font-mono);
+        font-size: 0.64rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        border-left: 2px solid var(--c-blood);
+        padding-left: 0.7em;
+    }
+    .facet__chips {
         display: flex;
         flex-wrap: wrap;
         gap: 0.45rem;
     }
+
     .chip {
+        display: inline-flex;
+        align-items: center;
         border: 1px solid #242424;
-        padding: 0.32rem 0.7rem;
+        padding: 0.34rem 0.7rem;
         font-family: var(--font-mono);
         font-size: 0.68rem;
         letter-spacing: 0.12em;
@@ -103,9 +215,19 @@ const total = PROJECTS.length;
         background: transparent;
         cursor: pointer;
         transition:
-            color 0.25s ease,
-            border-color 0.25s ease,
-            background 0.25s ease;
+            color 0.22s ease,
+            border-color 0.22s ease,
+            background 0.22s ease;
+    }
+    .chip--cat {
+        font-size: 0.72rem;
+        padding: 0.38rem 0.85rem;
+    }
+    .chip__n {
+        margin-left: 0.55em;
+        font-size: 0.85em;
+        color: var(--c-ember);
+        opacity: 0.75;
     }
     .chip:hover,
     .chip:focus-visible {
@@ -118,77 +240,144 @@ const total = PROJECTS.length;
     }
     .chip.is-active {
         border-color: var(--c-salmon);
-        background: rgba(226, 163, 153, 0.12);
+        background: rgba(226, 163, 153, 0.14);
         color: var(--c-salmon);
     }
-    .filters__count {
-        margin: 0;
-        flex-shrink: 0;
+    .chip--cat.is-active {
+        background: rgba(255, 74, 50, 0.16);
+        border-color: var(--c-ember);
+        color: #ffd9d0;
+    }
+    .chip.is-active .chip__n {
+        opacity: 1;
+    }
+
+    .fconsole__foot {
+        display: flex;
+        justify-content: flex-end;
+    }
+    .fconsole__clear {
+        border: 1px solid #242424;
+        background: transparent;
+        padding: 0.35rem 0.75rem;
         font-family: var(--font-mono);
-        font-size: 0.82rem;
-        letter-spacing: 0.16em;
+        font-size: 0.66rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
         color: var(--c-dim);
-        font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        transition:
+            color 0.22s ease,
+            border-color 0.22s ease,
+            opacity 0.22s ease;
     }
-    .filters__num {
+    .fconsole__clear:not(:disabled):hover,
+    .fconsole__clear:not(:disabled):focus-visible {
         color: var(--c-salmon);
+        border-color: var(--c-salmon);
     }
-    .filters__sep {
-        margin: 0 0.4em;
-        opacity: 0.6;
+    .fconsole__clear:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 2px;
     }
-    .filters__empty {
+    .fconsole__clear:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .fconsole__empty {
         margin: 0;
         border: 1px solid #1c1c1c;
-        padding: 1.5rem;
+        padding: 1.25rem;
         font-family: var(--font-mono);
         font-size: 0.85rem;
+        letter-spacing: 0.04em;
         color: var(--c-dim);
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .chip {
+        .chip,
+        .fconsole__clear {
             transition: none;
         }
     }
 </style>
 
 <script>
-    function initProjectFilters(): void {
-        const bar = document.querySelector<HTMLElement>("[data-filters]");
-        if (!bar || bar.dataset.ready) return;
-        bar.dataset.ready = "1";
+    type Facet = "cat" | "tech";
 
-        const buttons = Array.from(
-            bar.querySelectorAll<HTMLButtonElement>("[data-filter]"),
+    function initProjectFilters(): void {
+        const root = document.querySelector<HTMLElement>("[data-filters]");
+        if (!root || root.dataset.ready) return;
+        root.dataset.ready = "1";
+
+        const chips = Array.from(
+            root.querySelectorAll<HTMLButtonElement>("[data-facet]"),
         );
+        const clearBtn = root.querySelector<HTMLButtonElement>("[data-clear]");
         const cards = Array.from(
             document.querySelectorAll<HTMLElement>("[data-project-card]"),
         );
-        const countEl = bar.querySelector<HTMLElement>("[data-count]");
-        const empty = bar.querySelector<HTMLElement>("[data-no-results]");
-        if (!buttons.length || !cards.length) return;
+        const countEl = root.querySelector<HTMLElement>("[data-count]");
+        const empty = root.querySelector<HTMLElement>("[data-no-results]");
+        if (!chips.length || !cards.length) return;
 
-        function apply(filter: string): void {
+        const selected: Record<Facet, Set<string>> = {
+            cat: new Set<string>(),
+            tech: new Set<string>(),
+        };
+
+        const update = (): void => {
             let shown = 0;
             cards.forEach((card) => {
-                const tags = (card.dataset.tags ?? "").split("|");
-                const match = filter === "all" || tags.includes(filter);
+                const cats = (card.dataset.categories ?? "")
+                    .split("|")
+                    .filter(Boolean);
+                const tags = (card.dataset.tags ?? "")
+                    .split("|")
+                    .filter(Boolean);
+                const catOk =
+                    selected.cat.size === 0 ||
+                    cats.some((c) => selected.cat.has(c));
+                const techOk =
+                    selected.tech.size === 0 ||
+                    tags.some((tag) => selected.tech.has(tag));
+                const match = catOk && techOk;
                 card.hidden = !match;
                 if (match) shown++;
             });
-            buttons.forEach((b) => {
-                const on = b.dataset.filter === filter;
-                b.classList.toggle("is-active", on);
-                b.setAttribute("aria-pressed", on ? "true" : "false");
-            });
             if (countEl) countEl.textContent = String(shown);
             if (empty) empty.hidden = shown > 0;
-        }
+            if (clearBtn) {
+                clearBtn.disabled =
+                    selected.cat.size === 0 && selected.tech.size === 0;
+            }
+        };
 
-        buttons.forEach((b) =>
-            b.addEventListener("click", () => apply(b.dataset.filter ?? "all")),
-        );
+        chips.forEach((chip) => {
+            chip.addEventListener("click", () => {
+                const facet = chip.dataset.facet as Facet | undefined;
+                const value = chip.dataset.value ?? "";
+                if (!facet || !selected[facet]) return;
+                const set = selected[facet];
+                const on = !set.has(value);
+                if (on) set.add(value);
+                else set.delete(value);
+                chip.classList.toggle("is-active", on);
+                chip.setAttribute("aria-pressed", on ? "true" : "false");
+                update();
+            });
+        });
+
+        clearBtn?.addEventListener("click", () => {
+            selected.cat.clear();
+            selected.tech.clear();
+            chips.forEach((c) => {
+                c.classList.remove("is-active");
+                c.setAttribute("aria-pressed", "false");
+            });
+            update();
+        });
     }
 
     document.addEventListener("astro:page-load", initProjectFilters);
