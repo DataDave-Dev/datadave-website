@@ -11,9 +11,9 @@ export const ui = {
         "lang.switchTo": "Ver en inglés",
 
         // ---- Hero ----
-        "hero.kicker": "DESARROLLADOR DE SOFTWARE · DATOS",
+        "hero.kicker": "DESARROLLADOR · AUTOMATIZACIÓN · DATOS",
         "hero.subhead":
-            "Desarrollador full-stack que convierte ideas en software listo para producción: aplicaciones, APIs y pipelines de datos que las empresas usan a diario.",
+            "Construyo los sistemas con los que opera un negocio: automatizo lo manual, conecto los datos y los dejo listos para decidir. Software que de verdad se usa, no demos.",
         "hero.cta": "VER PERFIL →",
         "hero.hint": "[ sobre mí · stack · proyectos ]",
         "hero.stackAria": "Stack principal",
@@ -158,7 +158,7 @@ export const ui = {
         // ---- SEO ----
         "seo.defaultTitle": "DataDave · Desarrollador de software y datos",
         "seo.defaultDesc":
-            "Portfolio de DataDave: desarrollador full-stack que construye aplicaciones, APIs y pipelines de datos listos para producción.",
+            "Portfolio de DataDave: desarrollador full-stack y de datos. Construyo los sistemas con los que opera un negocio —automatizaciones, APIs y pipelines—; software que de verdad se usa, no demos.",
         "seo.aboutTitle": "Sobre mí · DataDave",
         "seo.aboutDesc":
             "Perfil de DataDave: programador full-stack y de datos. Conoce mi historia, mi stack, cómo trabajo y mis proyectos.",
@@ -183,9 +183,9 @@ export const ui = {
         "lang.switchTo": "View in Spanish",
 
         // ---- Hero ----
-        "hero.kicker": "SOFTWARE & DATA DEVELOPER",
+        "hero.kicker": "DEVELOPER · AUTOMATION · DATA",
         "hero.subhead":
-            "Full-stack developer who turns ideas into production-ready software: applications, APIs and data pipelines that companies rely on every day.",
+            "I build the systems a business runs on: I automate the manual work, connect the data and get it ready to decide. Software that's actually used, not demos.",
         "hero.cta": "VIEW PROFILE →",
         "hero.hint": "[ about · stack · projects ]",
         "hero.stackAria": "Core stack",
@@ -330,7 +330,7 @@ export const ui = {
         // ---- SEO ----
         "seo.defaultTitle": "DataDave · Software & data developer",
         "seo.defaultDesc":
-            "DataDave's portfolio: full-stack developer building production-ready applications, APIs and data pipelines.",
+            "DataDave's portfolio: full-stack and data developer. I build the systems a business runs on —automations, APIs and pipelines—; software that's actually used, not demos.",
         "seo.aboutTitle": "About me · DataDave",
         "seo.aboutDesc":
             "DataDave's profile: full-stack and data developer. My background, my stack, how I work and my projects.",
