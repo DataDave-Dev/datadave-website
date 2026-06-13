@@ -21,6 +21,13 @@
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
+/* Con el lightbox de la galería abierto, oculta la isla de navegación: un modal a
+   pantalla completa no debe tener la barra flotante encima (queda por encima por el
+   contexto de apilamiento del .crt). */
+body[data-lightbox="open"] .dock {
+    display: none;
+}
+
 :root {
     --c-bg: #080808;
     --c-surface: #1a1a1a;

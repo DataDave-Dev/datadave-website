@@ -685,6 +685,8 @@ const t = useTranslations(getLangFromUrl(Astro.url));
             setLbImage();
             lightbox.hidden = false;
             document.body.style.overflow = "hidden";
+            // Oculta la isla de navegación mientras el modal está abierto.
+            document.body.dataset.lightbox = "open";
             lastFocus = document.activeElement as HTMLElement;
             closeBtn?.focus();
         }
@@ -692,6 +694,7 @@ const t = useTranslations(getLangFromUrl(Astro.url));
             if (!lightbox) return;
             lightbox.hidden = true;
             document.body.style.overflow = "";
+            delete document.body.dataset.lightbox;
             setActive(lbIndex);
             lastFocus?.focus();
         }
