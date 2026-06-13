@@ -1,0 +1,222 @@
+---
+// Footer global (estilo consola CRT). Estático y sin JS: vive fuera del .crt de
+// cada página, así no entra en el sistema de reveal/encendido y aparece siempre.
+// Absorbe la antigua tira de telemetría de las páginas internas.
+import { CONTACT, FULL_NAME } from "@/const/profile";
+import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const year = new Date().getFullYear();
+const githubHandle =
+    CONTACT.github.replace(/\/+$/, "").split("/").pop() ?? "GitHub";
+
+const navItems = [
+    { href: localizePath("/", lang), label: t("nav.home") },
+    { href: localizePath("/about", lang), label: t("nav.about") },
+    { href: localizePath("/trayectoria", lang), label: t("nav.career") },
+    { href: localizePath("/projects", lang), label: t("nav.projects") },
+    { href: localizePath("/contacto", lang), label: t("nav.contact") },
+];
+
+interface Channel {
+    label: string;
+    value: string;
+    href?: string;
+    external?: boolean;
+}
+const channels: Channel[] = [
+    {
+        label: t("contact.chGithub"),
+        value: githubHandle,
+        href: CONTACT.github,
+        external: true,
+    },
+    {
+        label: t("contact.chLinkedin"),
+        value: FULL_NAME,
+        href: CONTACT.linkedin,
+        external: true,
+    },
+    {
+        label: t("contact.chEmail"),
+        value: CONTACT.email,
+        href: `mailto:${CONTACT.email}`,
+    },
+    { label: t("contact.chLocation"), value: t("contact.location") },
+];
+---
+
+<footer class="site-footer" aria-label={t("footer.ariaLabel")}>
+    <div
+        class="mx-auto flex max-w-[72rem] flex-col gap-[clamp(2rem,1.5rem+2.5vw,3.25rem)] px-[clamp(1.25rem,1rem+4vw,4rem)] pt-[clamp(2.5rem,2rem+3vw,4rem)] pb-[clamp(6rem,5rem+4vw,8rem)]"
+    >
+        <!-- Marca + estado -->
+        <div class="flex flex-wrap items-start justify-between gap-x-8 gap-y-5">
+            <div class="max-w-[44ch]">
+                <p
+                    class="font-display text-[clamp(1.7rem,1.3rem+2vw,2.6rem)] uppercase leading-none tracking-[0.03em] text-bone"
+                >
+                    DataDave
+                </p>
+                <p
+                    class="mt-3 font-mono text-[0.82rem] leading-relaxed text-dim"
+                >
+                    {t("footer.tagline")}
+                </p>
+            </div>
+
+            <p
+                class="inline-flex items-center gap-2 font-mono text-[0.72rem] uppercase tracking-[0.18em] text-bone"
+            >
+                <span class="foot-dot" aria-hidden="true"></span>
+                {t("contact.status")}
+            </p>
+        </div>
+
+        <!-- Columnas: navegación + canales -->
+        <div class="grid gap-[clamp(2rem,1.5rem+2vw,3rem)] sm:grid-cols-2">
+            <nav aria-label={t("nav.ariaLabel")}>
+                <p
+                    class="mb-4 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-blood"
+                >
+                    {t("footer.navLabel")}
+                </p>
+                <ul class="flex flex-col">
+                    {
+                        navItems.map((it, i) => (
+                            <li>
+                                <a
+                                    href={it.href}
+                                    class="group flex items-baseline gap-3 border-b border-[#161616] py-2.5 font-mono text-[0.9rem] text-dim transition-colors duration-200 hover:text-salmon focus-visible:text-salmon focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-salmon"
+                                >
+                                    <span class="text-[0.64rem] tabular-nums text-[#57514c] transition-colors duration-200 group-hover:text-salmon">
+                                        {String(i + 1).padStart(2, "0")}
+                                    </span>
+                                    {it.label}
+                                </a>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </nav>
+
+            <div>
+                <p
+                    class="mb-4 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-blood"
+                >
+                    {t("footer.channelsLabel")}
+                </p>
+                <ul class="flex flex-col">
+                    {
+                        channels.map((c) => (
+                            <li class="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-[#161616] py-2.5">
+                                <span class="w-[5rem] shrink-0 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-dim">
+                                    {c.label}
+                                </span>
+                                {c.href ? (
+                                    <a
+                                        href={c.href}
+                                        {...(c.external
+                                            ? {
+                                                  target: "_blank",
+                                                  rel: "noopener noreferrer",
+                                                  "aria-label": `${c.label}: ${c.value} — ${t("contact.openAria")}`,
+                                              }
+                                            : {})}
+                                        class="min-w-0 break-words font-mono text-[0.9rem] text-bone transition-colors duration-200 hover:text-salmon focus-visible:text-salmon focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-salmon"
+                                    >
+                                        {c.value}
+                                        {c.external && (
+                                            <span
+                                                class="text-[0.85em] text-salmon"
+                                                aria-hidden="true"
+                                            >
+                                                {" "}
+                                                ↗
+                                            </span>
+                                        )}
+                                    </a>
+                                ) : (
+                                    <span class="min-w-0 break-words font-mono text-[0.9rem] text-[#cfc9c4]">
+                                        {c.value}
+                                    </span>
+                                )}
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- Barra inferior: copyright + colofón + telemetría -->
+        <div
+            class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-[#1c1c1c] pt-6"
+        >
+            <p class="font-mono text-[0.7rem] text-dim">
+                © {year} {FULL_NAME}. {t("footer.rights")}
+            </p>
+            <p class="font-mono text-[0.66rem] tracking-[0.04em] text-[#57514c]">
+                {t("footer.colophon")}
+            </p>
+            <p
+                class="foot-signal font-mono text-[0.62rem] uppercase tracking-[0.2em] text-dim"
+                aria-hidden="true"
+            >
+                <span>SIGNAL ▰▰▰▰▰▰▱</span> · NTSC 60Hz · {t("telemetry.onAir")}
+            </p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* Vive sobre el fondo de puntos del body; un panel apenas más oscuro lo
+       separa del contenido, con una fina línea de barrido ámbar arriba. */
+    .site-footer {
+        position: relative;
+        background: #0a0a0a;
+        border-top: 1px solid #1c1c1c;
+    }
+    .site-footer::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 74, 50, 0.5),
+            transparent
+        );
+        pointer-events: none;
+    }
+
+    .foot-dot {
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 50%;
+        background: #34d058;
+        box-shadow: 0 0 0.5em #34d058;
+        animation: footPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes footPulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.35;
+        }
+    }
+
+    .foot-signal span:first-child {
+        color: var(--c-blood);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .foot-dot {
+            animation: none;
+        }
+    }
+</style>

@@ -3,7 +3,6 @@
 // Aporta la atmósfera analógica, la barra superior (volver + canal + idioma), el
 // marco con holgura para la isla de navegación y el pie de telemetría.
 import LanguageToggle from "@/components/ui/LanguageToggle.astro";
-import AboutTelemetry from "@/components/sections/about/AboutTelemetry.astro";
 import { getLangFromUrl, useTranslations, localizePath } from "@/i18n/utils";
 
 interface Props {
@@ -39,8 +38,6 @@ const t = useTranslations(lang);
         </header>
 
         <slot />
-
-        <AboutTelemetry />
     </div>
 </main>
 

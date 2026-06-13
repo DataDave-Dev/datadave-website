@@ -2,6 +2,7 @@
 import { ClientRouter } from "astro:transitions";
 import Seo from "@/components/seo/Seo.astro";
 import BottomNav from "@/components/ui/BottomNav.astro";
+import SiteFooter from "@/components/ui/SiteFooter.astro";
 import { LOCALES, HREFLANG, DEFAULT_LOCALE } from "@/i18n/config";
 import {
 	getLangFromUrl,
@@ -102,6 +103,7 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 	</head>
 	<body>
 		<slot />
+		<SiteFooter />
 		<BottomNav />
 	</body>
 </html>
@@ -736,6 +738,21 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 	// apuntando a DOM que se va a eliminar.
 	document.addEventListener("astro:before-swap", () => {
 		ScrollTriggerRef?.getAll().forEach((t) => t.kill());
+	});
+
+	// En cada swap SPA, Astro re-renderiza el <html> del servidor y borra las
+	// clases que puso el script inline (`js`, `fonts-ready`). Sin `js`, el
+	// overlay negro de /about no cubre y el contenido asoma en crudo antes del
+	// encendido. `after-swap` corre antes del primer paint, así que reponerlas
+	// aquí evita el parpadeo.
+	document.addEventListener("astro:after-swap", () => {
+		const r = document.documentElement;
+		r.classList.add("js");
+		r.classList.add(
+			document.fonts && document.fonts.status !== "loaded"
+				? "fonts-loading"
+				: "fonts-ready",
+		);
 	});
 
 	document.addEventListener("astro:page-load", () => {

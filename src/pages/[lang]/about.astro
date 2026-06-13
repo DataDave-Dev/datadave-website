@@ -9,7 +9,6 @@ import AboutBio from "@/components/sections/about/AboutBio.astro";
 import AboutSkills from "@/components/sections/about/AboutSkills.astro";
 import AboutWorkflow from "@/components/sections/about/AboutWorkflow.astro";
 import Testimonials from "@/components/sections/about/Testimonials.astro";
-import AboutTelemetry from "@/components/sections/about/AboutTelemetry.astro";
 
 export const getStaticPaths = (() =>
     LOCALES.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
@@ -36,7 +35,6 @@ const t = useTranslations(lang);
             <AboutSkills />
             <AboutWorkflow />
             <Testimonials />
-            <AboutTelemetry />
         </div>
 
         <!-- Capas de encendido CRT -->

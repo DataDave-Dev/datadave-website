@@ -21,6 +21,15 @@ export const ui = {
         // ---- Telemetría (pie CRT, compartido) ----
         "telemetry.onAir": "EN EMISIÓN DESDE 2022",
 
+        // ---- Footer global ----
+        "footer.tagline":
+            "Construyo los sistemas con los que opera un negocio: automatización, APIs y datos listos para decidir.",
+        "footer.navLabel": "// NAVEGACIÓN",
+        "footer.channelsLabel": "// CANALES",
+        "footer.rights": "Todos los derechos reservados.",
+        "footer.colophon": "Construido con Astro · GSAP · TypeScript",
+        "footer.ariaLabel": "Pie de página",
+
         // ---- Bottom-nav (isla) ----
         "nav.ariaLabel": "Navegación principal",
         "nav.home": "Inicio",
@@ -69,7 +78,7 @@ export const ui = {
         "contactPage.intro":
             "¿Una idea, un proyecto o una vacante en mente? Hablemos.",
         // Panel de canales de contacto
-        "contact.status": "Disponible para proyectos",
+        "contact.status": "Disponible para trabajar.",
         "contact.channelsAria": "Canales de contacto",
         "contact.chEmail": "Email",
         "contact.chGithub": "GitHub",
@@ -193,6 +202,15 @@ export const ui = {
         // ---- Telemetry (CRT footer, shared) ----
         "telemetry.onAir": "ON AIR SINCE 2022",
 
+        // ---- Global footer ----
+        "footer.tagline":
+            "I build the systems a business runs on: automation, APIs and data ready to decide.",
+        "footer.navLabel": "// NAVIGATION",
+        "footer.channelsLabel": "// CHANNELS",
+        "footer.rights": "All rights reserved.",
+        "footer.colophon": "Built with Astro · GSAP · TypeScript",
+        "footer.ariaLabel": "Footer",
+
         // ---- Bottom-nav (island) ----
         "nav.ariaLabel": "Main navigation",
         "nav.home": "Home",
@@ -241,7 +259,7 @@ export const ui = {
         "contactPage.intro":
             "An idea, a project or a role in mind? Let's talk.",
         // Contact channels panel
-        "contact.status": "Available for projects",
+        "contact.status": "Available to work.",
         "contact.channelsAria": "Contact channels",
         "contact.chEmail": "Email",
         "contact.chGithub": "GitHub",
