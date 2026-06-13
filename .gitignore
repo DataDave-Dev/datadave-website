@@ -3,6 +3,7 @@ dist/
 
 # ai docs
 .claude
+ai-docs/
 
 # generated types
 .astro/

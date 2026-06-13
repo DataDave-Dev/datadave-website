@@ -10,14 +10,7 @@ const headline = "DataDave";
 const letters = headline.split("");
 
 // EDITA: tu stack real, en orden de relevancia
-const stack = [
-    "TypeScript",
-    "Python",
-    "Node",
-    "React",
-    "Astro",
-    "SQL",
-];
+const stack = ["SQL", "Python", "Node", "React", "Next.JS", "Astro"];
 ---
 
 <section id="hero" class="crt" aria-labelledby="hero-title">
@@ -273,7 +266,10 @@ const stack = [
                 #5a0000 100%
             );
         /* La capa de lava (2ª) se desplaza vía --boil-x (GSAP); el resto fijo. */
-        background-position: 0 0, var(--boil-x) 0, 0 0;
+        background-position:
+            0 0,
+            var(--boil-x) 0,
+            0 0;
         -webkit-background-clip: text;
         background-clip: text;
     }

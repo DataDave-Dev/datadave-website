@@ -1,6 +1,4 @@
 ---
-// Raíz: sin contenido propio. Detecta el idioma en el cliente y redirige a
-// /es o /en, con fallback sin JS (meta refresh) y noindex.
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config";
 
 const site = Astro.site ?? new URL("https://datadave.dev");
@@ -29,10 +27,15 @@ const site = Astro.site ?? new URL("https://datadave.dev");
             href={new URL(`/${DEFAULT_LOCALE}`, site).href}
         />
         <link rel="canonical" href={new URL(`/${DEFAULT_LOCALE}`, site).href} />
-        <script is:inline define:vars={{ locales: LOCALES, fallback: DEFAULT_LOCALE }}>
+        <script
+            is:inline
+            define:vars={{ locales: LOCALES, fallback: DEFAULT_LOCALE }}
+        >
             (function () {
                 try {
-                    var prefs = navigator.languages || [navigator.language || ""];
+                    var prefs = navigator.languages || [
+                        navigator.language || "",
+                    ];
                     var pick = fallback;
                     for (var i = 0; i < prefs.length; i++) {
                         var code = String(prefs[i]).toLowerCase().slice(0, 2);
