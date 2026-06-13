@@ -1,43 +1,339 @@
 ---
-import { CONTACT } from "@/const/profile";
+// Panel de contacto (consola): estado de disponibilidad, lista de canales
+// (email con copiar, GitHub, LinkedIn, ubicación) y CTA. Se usa en /contacto.
+import { CONTACT, FULL_NAME } from "@/const/profile";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+const githubHandle = CONTACT.github.replace(/\/+$/, "").split("/").pop() ?? "GitHub";
+
+interface Channel {
+    key: string;
+    label: string;
+    value: string;
+    href?: string;
+    external?: boolean;
+    copy?: boolean;
+}
+
+const channels: Channel[] = [
+    {
+        key: "email",
+        label: t("contact.chEmail"),
+        value: CONTACT.email,
+        href: `mailto:${CONTACT.email}`,
+        copy: true,
+    },
+    {
+        key: "github",
+        label: t("contact.chGithub"),
+        value: githubHandle,
+        href: CONTACT.github,
+        external: true,
+    },
+    {
+        key: "linkedin",
+        label: t("contact.chLinkedin"),
+        value: FULL_NAME,
+        href: CONTACT.linkedin,
+        external: true,
+    },
+    {
+        key: "location",
+        label: t("contact.chLocation"),
+        value: t("contact.location"),
+    },
+];
 ---
 
 <section
     id="contacto"
-    class="scroll-mt-24 about-reveal border border-[#1c1c1c] bg-linear-to-br from-[rgba(153,0,0,0.08)] to-transparent p-8 md:p-12"
-    aria-labelledby="contacto-title"
+    class="contact"
+    aria-labelledby="contact-title"
+    data-contact
 >
-    <p
-        id="contacto-title"
-        class="mb-8 max-w-[40ch] font-display text-3xl uppercase leading-[0.95] text-bone md:text-5xl"
-    >
-        {t("about.contactHead1")}<br />{t("about.contactHead2")}
+    <p class="contact__status">
+        <span class="contact__dot" aria-hidden="true"></span>
+        {t("contact.status")}
     </p>
 
-    <div class="flex flex-wrap items-center gap-x-8 gap-y-4 font-mono text-sm">
-        <a
-            href={`mailto:${CONTACT.email}`}
-            class="inline-flex items-center gap-2 border border-salmon px-5 py-2 uppercase tracking-[0.2em] text-salmon transition-colors duration-300 hover:bg-salmon hover:text-bg"
-        >
-            <span aria-hidden="true">&gt;</span> {t("about.contactWrite")}
-        </a>
-        <a
-            href={CONTACT.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="uppercase tracking-[0.15em] text-dim transition-colors duration-200 hover:text-salmon"
-            >GitHub↗</a
-        >
-        <a
-            href={CONTACT.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="uppercase tracking-[0.15em] text-dim transition-colors duration-200 hover:text-salmon"
-            >LinkedIn↗</a
-        >
-    </div>
+    <ul class="channels" aria-label={t("contact.channelsAria")}>
+        {
+            channels.map((c, i) => (
+                <li class="channel">
+                    <span class="channel__idx" aria-hidden="true">
+                        {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span class="channel__label">{c.label}</span>
+
+                    {c.href ? (
+                        <a
+                            class="channel__value"
+                            href={c.href}
+                            {...(c.external
+                                ? {
+                                      target: "_blank",
+                                      rel: "noopener noreferrer",
+                                      "aria-label": `${c.label}: ${c.value} — ${t("contact.openAria")}`,
+                                  }
+                                : {})}
+                        >
+                            {c.value}
+                            {c.external && (
+                                <span class="channel__ext" aria-hidden="true">
+                                    ↗
+                                </span>
+                            )}
+                        </a>
+                    ) : (
+                        <span class="channel__value channel__value--static">
+                            {c.value}
+                        </span>
+                    )}
+
+                    {c.copy && (
+                        <button
+                            type="button"
+                            class="channel__copy"
+                            data-copy={c.value}
+                            data-copied={t("contact.copied")}
+                            aria-label={t("contact.copyAria")}
+                        >
+                            <span data-copy-label>{t("contact.copy")}</span>
+                        </button>
+                    )}
+                </li>
+            ))
+        }
+    </ul>
+
+    <a class="contact__cta" href={`mailto:${CONTACT.email}`}>
+        <span aria-hidden="true">&gt;</span>
+        {t("about.contactWrite")}
+    </a>
 </section>
+
+<style>
+    .contact {
+        position: relative;
+        border: 1px solid #242424;
+        background:
+            radial-gradient(
+                120% 140% at 100% 0%,
+                rgba(153, 0, 0, 0.12),
+                transparent 55%
+            ),
+            rgba(13, 13, 13, 0.5);
+        padding: clamp(1.5rem, 1rem + 3vw, 3rem);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+    }
+    .contact::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 74, 50, 0.5),
+            transparent
+        );
+        pointer-events: none;
+    }
+
+    /* ---- Estado de disponibilidad ---- */
+    .contact__status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6em;
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--c-bone);
+    }
+    .contact__dot {
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 50%;
+        background: #34d058;
+        box-shadow: 0 0 0.5em #34d058;
+        animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.35;
+        }
+    }
+
+    /* ---- Lista de canales ---- */
+    .channels {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        border-top: 1px solid #1c1c1c;
+    }
+    .channel {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5rem 1.1rem;
+        padding: 1rem 0.5rem;
+        border-bottom: 1px solid #1c1c1c;
+        transition: background 0.25s ease;
+    }
+    .channel:hover {
+        background: rgba(255, 74, 50, 0.04);
+    }
+    .channel__idx {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.12em;
+        color: #57514c;
+        font-variant-numeric: tabular-nums;
+    }
+    .channel__label {
+        flex: 0 0 5.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+    }
+    .channel__value {
+        flex: 1 1 14rem;
+        min-width: 0;
+        font-family: var(--font-mono);
+        font-size: clamp(0.95rem, 0.9rem + 0.4vw, 1.15rem);
+        color: var(--c-bone);
+        text-decoration: none;
+        word-break: break-word;
+        transition: color 0.2s ease;
+    }
+    a.channel__value:hover,
+    a.channel__value:focus-visible {
+        color: var(--c-salmon);
+    }
+    a.channel__value:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 3px;
+    }
+    .channel__value--static {
+        color: #cfc9c4;
+    }
+    .channel__ext {
+        color: var(--c-salmon);
+        font-size: 0.85em;
+    }
+
+    .channel__copy {
+        flex-shrink: 0;
+        border: 1px solid #2a2a2a;
+        background: transparent;
+        padding: 0.28rem 0.7rem;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--c-dim);
+        cursor: pointer;
+        transition:
+            color 0.2s ease,
+            border-color 0.2s ease,
+            background 0.2s ease;
+    }
+    .channel__copy:hover,
+    .channel__copy:focus-visible {
+        color: var(--c-salmon);
+        border-color: var(--c-salmon);
+    }
+    .channel__copy:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 2px;
+    }
+    .channel__copy.is-copied {
+        color: #34d058;
+        border-color: #34d058;
+    }
+
+    /* ---- CTA ---- */
+    .contact__cta {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+        border: 1px solid var(--c-salmon);
+        padding: 0.7rem 1.6rem;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--c-salmon);
+        text-decoration: none;
+        transition:
+            background 0.3s ease,
+            color 0.3s ease;
+    }
+    .contact__cta:hover,
+    .contact__cta:focus-visible {
+        background: var(--c-salmon);
+        color: var(--c-bg);
+    }
+    .contact__cta:focus-visible {
+        outline: 2px solid var(--c-salmon);
+        outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .contact__dot {
+            animation: none;
+        }
+        .channel,
+        .channel__value,
+        .channel__copy,
+        .contact__cta {
+            transition: none;
+        }
+    }
+</style>
+
+<script>
+    function initContact(): void {
+        document
+            .querySelectorAll<HTMLButtonElement>("[data-copy]")
+            .forEach((btn) => {
+                if (btn.dataset.copyReady) return;
+                btn.dataset.copyReady = "1";
+                btn.addEventListener("click", async () => {
+                    const text = btn.dataset.copy ?? "";
+                    const label =
+                        btn.querySelector<HTMLElement>("[data-copy-label]");
+                    if (!label) return;
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        const original = label.textContent;
+                        label.textContent = btn.dataset.copied ?? "OK";
+                        btn.classList.add("is-copied");
+                        window.setTimeout(() => {
+                            label.textContent = original;
+                            btn.classList.remove("is-copied");
+                        }, 1800);
+                    } catch {
+                        // Sin permiso de portapapeles: el enlace mailto sigue disponible.
+                    }
+                });
+            });
+    }
+
+    document.addEventListener("astro:page-load", initContact);
+    initContact();
+</script>

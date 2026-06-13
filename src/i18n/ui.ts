@@ -68,6 +68,18 @@ export const ui = {
         "contactPage.kicker": "PERFIL / CONTACTO",
         "contactPage.intro":
             "¿Una idea, un proyecto o una vacante en mente? Hablemos.",
+        // Panel de canales de contacto
+        "contact.status": "Disponible para proyectos",
+        "contact.channelsAria": "Canales de contacto",
+        "contact.chEmail": "Email",
+        "contact.chGithub": "GitHub",
+        "contact.chLinkedin": "LinkedIn",
+        "contact.chLocation": "Ubicación",
+        "contact.location": "Nuevo León, México",
+        "contact.copy": "Copiar",
+        "contact.copied": "Copiado ✓",
+        "contact.copyAria": "Copiar el correo al portapapeles",
+        "contact.openAria": "Abrir en una pestaña nueva",
 
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — SOBRE MÍ",
@@ -228,6 +240,18 @@ export const ui = {
         "contactPage.kicker": "PROFILE / CONTACT",
         "contactPage.intro":
             "An idea, a project or a role in mind? Let's talk.",
+        // Contact channels panel
+        "contact.status": "Available for projects",
+        "contact.channelsAria": "Contact channels",
+        "contact.chEmail": "Email",
+        "contact.chGithub": "GitHub",
+        "contact.chLinkedin": "LinkedIn",
+        "contact.chLocation": "Location",
+        "contact.location": "Nuevo León, Mexico",
+        "contact.copy": "Copy",
+        "contact.copied": "Copied ✓",
+        "contact.copyAria": "Copy email to clipboard",
+        "contact.openAria": "Open in a new tab",
 
         // ---- About: topbar + lead ----
         "about.channel": "// CH 02 — ABOUT ME",
