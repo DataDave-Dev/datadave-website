@@ -380,5 +380,9 @@ const tags = [...tagCounts.entries()]
         });
     }
 
+    // Tras cada navegación del ClientRouter, y de inmediato (por si el script se
+    // carga durante una navegación SPA y astro:page-load ya se disparó). El guard
+    // data-ready evita la doble inicialización.
     document.addEventListener("astro:page-load", initProjectFilters);
+    initProjectFilters();
 </script>

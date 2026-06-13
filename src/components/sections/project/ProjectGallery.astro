@@ -767,6 +767,10 @@ const t = useTranslations(getLangFromUrl(Astro.url));
             .forEach(setupGallery);
     }
 
-    // Inicial + tras cada navegación del ClientRouter
+    // Tras cada navegación del ClientRouter.
     document.addEventListener("astro:page-load", initGalleries);
+    // Y de inmediato: si el script se carga durante una navegación SPA,
+    // astro:page-load pudo dispararse antes de registrar el listener. El guard
+    // data-ready evita la doble inicialización.
+    initGalleries();
 </script>
