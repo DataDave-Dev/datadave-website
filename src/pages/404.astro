@@ -267,7 +267,6 @@ import Button from "@/components/ui/Button.astro";
             rgba(0, 0, 0, 0.18) 3px,
             rgba(0, 0, 0, 0.18) 4px
         );
-        mix-blend-mode: multiply;
     }
     .crt__vignette {
         position: absolute;
@@ -289,7 +288,8 @@ import Button from "@/components/ui/Button.astro";
     }
     .crt__grain {
         position: absolute;
-        inset: -50%;
+        inset: -20%;
+        will-change: transform;
         z-index: 2;
         pointer-events: none;
         opacity: 0.5;

@@ -347,7 +347,6 @@ const stack = ["SQL", "Python", "Node", "React", "Next.JS", "Astro"];
             rgba(0, 0, 0, 0.16) 3px,
             rgba(0, 0, 0, 0.16) 4px
         );
-        mix-blend-mode: multiply;
     }
 
     .crt__vignette {
@@ -387,7 +386,8 @@ const stack = ["SQL", "Python", "Node", "React", "Next.JS", "Astro"];
 
     .crt__grain {
         position: absolute;
-        inset: -50%;
+        inset: -20%;
+        will-change: transform;
         z-index: 2;
         pointer-events: none;
         opacity: 0.5;

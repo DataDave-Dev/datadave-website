@@ -82,7 +82,6 @@ const t = useTranslations(lang);
             rgba(0, 0, 0, 0.22) 3px,
             rgba(0, 0, 0, 0.22) 4px
         );
-        mix-blend-mode: multiply;
     }
     .crt__vignette {
         position: absolute;
@@ -98,7 +97,8 @@ const t = useTranslations(lang);
     }
     .crt__grain {
         position: absolute;
-        inset: -50%;
+        inset: -20%;
+        will-change: transform;
         z-index: 2;
         pointer-events: none;
         opacity: 0.4;
