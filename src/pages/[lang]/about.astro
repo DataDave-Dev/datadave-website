@@ -36,10 +36,6 @@ const t = useTranslations(lang);
             <AboutWorkflow />
             <Testimonials />
         </div>
-
-        <!-- Capas de encendido CRT -->
-        <div id="on-black" class="fx fx--black" aria-hidden="true"></div>
-        <div id="on-line" class="fx fx--line" aria-hidden="true"></div>
     </main>
 </Layout>
 
@@ -116,35 +112,9 @@ const t = useTranslations(lang);
         }
     }
 
-    /* ---------- Capas de encendido ---------- */
-    .fx {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        opacity: 0;
-        will-change: transform, opacity;
-    }
-    .fx--black {
-        z-index: 90;
-        background: #050505;
-        opacity: 0; /* sin JS no se tapa nada: el contenido queda visible */
-    }
-    /* Con JS, el overlay cubre hasta que el "encendido" de tubo lo retira. */
-    :global(html.js) .fx--black {
-        opacity: 1;
-    }
-    .fx--line {
-        z-index: 91;
-        background: #fff;
-        transform-origin: center center;
-    }
-
     @media (prefers-reduced-motion: reduce) {
         .crt__grain {
             animation: none;
-        }
-        .fx {
-            display: none;
         }
     }
 </style>

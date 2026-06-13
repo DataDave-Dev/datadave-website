@@ -28,6 +28,36 @@ body[data-lightbox="open"] .dock {
     display: none;
 }
 
+/* Capas de encendido CRT. Overlay global vivido en el <body> (Layout); sólo
+   cubre cuando hay una pantalla `.crt` en la página, así el home (hero) no se
+   tapa. El JS lo anima (negro → línea → reveal) en cada entrada. */
+.fx {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+.fx--black {
+    z-index: 90;
+    background: #050505;
+}
+.fx--line {
+    z-index: 91;
+    background: #fff;
+    transform-origin: center center;
+}
+/* Con JS y una pantalla `.crt` presente, el negro cubre hasta el encendido.
+   Sin JS o sin `.crt`, el contenido queda visible (opacity 0). */
+html.js body:has(main.crt) .fx--black {
+    opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+    .fx {
+        display: none;
+    }
+}
+
 :root {
     --c-bg: #080808;
     --c-surface: #1a1a1a;

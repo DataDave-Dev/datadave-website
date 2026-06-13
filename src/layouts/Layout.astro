@@ -103,6 +103,9 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 	</head>
 	<body>
 		<slot />
+		{/* Capas de encendido CRT (overlay global; sólo activo en páginas .crt). */}
+		<div id="on-black" class="fx fx--black" aria-hidden="true"></div>
+		<div id="on-line" class="fx fx--line" aria-hidden="true"></div>
 		<SiteFooter />
 		<BottomNav />
 	</body>
@@ -442,12 +445,13 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 		}
 	}
 
-	// Reveal por scroll de About + acentos atados al scroll (parallax/scrub).
-	// Reemplaza al antiguo .from(".about-reveal") en bloque. Mata triggers previos
-	// para rehacerse limpio en cada entrada SPA. "Una vez": cada grupo se revela al
-	// entrar y se queda (once:true). Con `reduced` cae a fades suaves (sin
-	// desplazamientos grandes ni parallax/scrub) por accesibilidad.
-	function setupAboutScroll(
+	// Reveal por scroll de cualquier pantalla `.crt` + acentos atados al scroll
+	// (parallax/scrub, sólo en About). Mata triggers previos para rehacerse limpio
+	// en cada entrada SPA. "Una vez": cada grupo se revela al entrar y se queda
+	// (once:true). Con `reduced` cae a fades suaves (sin desplazamientos grandes ni
+	// parallax/scrub) por accesibilidad. El footer global entra en TODAS las páginas
+	// (incluido el home), así toda vista tiene reveal por scroll.
+	function setupCrtScroll(
 		gsap: GsapLike,
 		ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger,
 		reduced: boolean,
@@ -502,31 +506,57 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 					},
 				};
 
-		// Lista plana de TODO lo animable de About, en orden del DOM
-		// (querySelectorAll devuelve en orden de documento = arriba→abajo).
-		const about = document.getElementById("about");
-		if (!about) return;
+		const main = document.querySelector<HTMLElement>("main.crt");
 		const HEAD_SEL = "h1, h2, h3, .title, .block-title, p.font-display";
-		const targets = Array.from(
-			about.querySelectorAll<HTMLElement>(
-				[
-					".topbar",
-					".lead > .about-reveal",
-					".bio > *",
-					".specs-wrap",
-					".skills > .block-title",
-					".skill-list > li",
-					'[aria-labelledby="metodo-title"] > :not(ul)',
-					'[aria-labelledby="metodo-title"] > ul > li',
-					"#proyectos > :not(ul)",
-					"#proyectos > ul > li",
-					'[aria-labelledby="testimonios-title"] > :not(ul)',
-					'[aria-labelledby="testimonios-title"] > ul > li',
-					"#contacto > :not(ul)",
-					".telemetry",
-				].join(", "),
-			),
-		);
+
+		// Objetivos a revelar, en orden del DOM (arriba→abajo). About tiene su
+		// cascada fina por elemento; el resto de pantallas `.crt` revelan por
+		// bloque (hijos directos de `.frame`, expandiendo listas en sus ítems).
+		const targets: HTMLElement[] = [];
+		if (main && main.id === "about") {
+			targets.push(
+				...Array.from(
+					main.querySelectorAll<HTMLElement>(
+						[
+							".topbar",
+							".lead > .about-reveal",
+							".bio > *",
+							".specs-wrap",
+							".skills > .block-title",
+							".skill-list > li",
+							'[aria-labelledby="metodo-title"] > :not(ul)',
+							'[aria-labelledby="metodo-title"] > ul > li',
+							"#proyectos > :not(ul)",
+							"#proyectos > ul > li",
+							'[aria-labelledby="testimonios-title"] > :not(ul)',
+							'[aria-labelledby="testimonios-title"] > ul > li',
+							"#contacto > :not(ul)",
+						].join(", "),
+					),
+				),
+			);
+		} else if (main) {
+			const frame = main.querySelector(".frame");
+			if (frame) {
+				const SKIP = new Set(["SCRIPT", "STYLE", "TEMPLATE", "LINK"]);
+				Array.from(frame.children).forEach((child) => {
+					const el = child as HTMLElement;
+					if (SKIP.has(el.tagName)) return; // nodos sin render
+					// Una lista de varios ítems se revela ítem a ítem (cascada);
+					// cualquier otro bloque entra como una sola pieza.
+					if (el.matches("ul, ol") && el.childElementCount > 1) {
+						targets.push(...(Array.from(el.children) as HTMLElement[]));
+					} else {
+						targets.push(el);
+					}
+				});
+			}
+		}
+
+		// El footer global cierra la cascada en cualquier página (incl. home).
+		const footer = document.querySelector<HTMLElement>(".site-footer");
+		if (footer) targets.push(footer);
+
 		if (!targets.length) return;
 
 		// Estado inicial oculto (sólo lo aún no revelado) para que no parpadeen
@@ -555,8 +585,12 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 					});
 				fresh.forEach((el, i) => {
 					el.dataset.revealed = "1";
-					const fx =
-						!reduced && el.matches(HEAD_SEL) ? E.wipe : E.rise;
+					// El footer es grande: entra con un fade suave, no en 3D.
+					const fx = el.classList.contains("site-footer")
+						? E.fade
+						: !reduced && el.matches(HEAD_SEL)
+							? E.wipe
+							: E.rise;
 					gsap.fromTo(el, fx.from, { ...fx.to, delay: i * STEP });
 				});
 			},
@@ -566,6 +600,16 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 		// dibujado por CSS.
 		if (reduced) {
 			ScrollTrigger.refresh();
+			return;
+		}
+
+		// Parallax/scrub sólo en About (usa sus anclas concretas). El resto de
+		// pantallas se quedan con el reveal por bloque, ya montado arriba.
+		if (!main || main.id !== "about") {
+			ScrollTrigger.refresh();
+			if (document.fonts && document.fonts.ready) {
+				document.fonts.ready.then(() => ScrollTrigger.refresh());
+			}
 			return;
 		}
 
@@ -634,33 +678,39 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 		}
 	}
 
-	async function runAboutEntrance() {
-		const about = document.getElementById("about");
+	async function runCrtEntrance() {
+		const main = document.querySelector<HTMLElement>("main.crt");
 		const black = document.getElementById("on-black");
 		const line = document.getElementById("on-line");
-		if (!about || !black || !line) return;
+		const reduced = prefersReduced();
 
-		const reveals =
-			document.querySelectorAll<HTMLElement>(".about-reveal");
+		// Páginas sin pantalla `.crt` (home): el hero tiene su propia entrada, así
+		// que aquí sólo dejamos montado el reveal por scroll del footer.
+		if (!main || !black || !line) {
+			try {
+				const { gsap } = await import("gsap");
+				const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+				gsap.registerPlugin(ScrollTrigger);
+				ScrollTriggerRef = ScrollTrigger;
+				setupCrtScroll(gsap, ScrollTrigger, reduced);
+			} catch {}
+			return;
+		}
+
+		// Failsafe: en <1.8 s el negro se retira pase lo que pase (lo de bajo de la
+		// línea de flotación no necesita red: se revela al hacer scroll).
 		const showAll = () => {
 			black.style.opacity = "0";
 			line.style.opacity = "0";
-			reveals.forEach((el) => {
-				el.style.opacity = "";
-				el.style.transform = "";
-			});
 		};
-
-		const reduced = prefersReduced();
-
-		// Failsafe: en <1.8 s el contenido queda visible pase lo que pase.
 		const safety = window.setTimeout(showAll, 1800);
 
 		let introSeen = false;
 		try {
-			introSeen = sessionStorage.getItem("aboutIntroSeen") === "1";
+			introSeen = sessionStorage.getItem("crtIntroSeen") === "1";
 		} catch {}
-		// El encendido CRT sólo en 1ª visita, sin ancla y con movimiento permitido.
+		// Encendido CRT completo sólo la 1ª pantalla por sesión, sin ancla y con
+		// movimiento permitido; el resto entra con un fundido rápido del negro.
 		const playIntro = !reduced && !introSeen && currentHash().length <= 1;
 
 		try {
@@ -671,7 +721,7 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 
 			if (playIntro) {
 				try {
-					sessionStorage.setItem("aboutIntroSeen", "1");
+					sessionStorage.setItem("crtIntroSeen", "1");
 				} catch {}
 				const tl = gsap.timeline({
 					onComplete: () => window.clearTimeout(safety),
@@ -686,13 +736,13 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 					.to("#on-black", { opacity: 0, duration: 0.25 }, "-=0.12")
 					// Arranca el reveal al desvanecer el negro: lo visible solapa la
 					// salida del tubo, sin hueco en blanco.
-					.add(() => setupAboutScroll(gsap, ScrollTrigger, false), "<")
+					.add(() => setupCrtScroll(gsap, ScrollTrigger, false), "<")
 					.to("#on-line", { opacity: 0, duration: 0.22 }, "<");
 			} else {
 				// Sin encendido (ancla, ya vista o reduce-motion): montamos triggers
 				// con el negro aún encima y luego lo retiramos, sin salto visible.
 				window.clearTimeout(safety);
-				setupAboutScroll(gsap, ScrollTrigger, reduced);
+				setupCrtScroll(gsap, ScrollTrigger, reduced);
 				gsap.to([black, line], { opacity: 0, duration: 0.2 });
 			}
 		} catch {
@@ -758,7 +808,7 @@ const xDefault = new URL(switchLocalePath(Astro.url, DEFAULT_LOCALE), site).href
 	document.addEventListener("astro:page-load", () => {
 		bindHeroExit();
 		runHeroEntrance();
-		runAboutEntrance();
+		runCrtEntrance();
 		scrollToHash();
 		pendingHash = "";
 	});
