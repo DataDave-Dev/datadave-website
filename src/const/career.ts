@@ -51,7 +51,7 @@ const CAREER_CONTENT: Record<Lang, CareerContent> = {
             {
                 title: "Técnico en Informática",
                 org: "CONALEP 290 Don Carlos Maldonado Elizondo",
-                start: "2020",
+                start: "2019",
                 end: "2023",
                 location: "Santiago, Nuevo León, México",
                 summary:
@@ -100,7 +100,7 @@ const CAREER_CONTENT: Record<Lang, CareerContent> = {
             {
                 title: "Computing Technician",
                 org: "CONALEP 290 Don Carlos Maldonado Elizondo",
-                start: "2020",
+                start: "2019",
                 end: "2023",
                 location: "Santiago, Nuevo León, Mexico",
                 summary:
