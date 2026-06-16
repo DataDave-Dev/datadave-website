@@ -407,6 +407,63 @@ const PROJECTS_ES: Project[] = [
             "Aportar a un proyecto open source masivo: entender una base de código ajena, seguir sus convenciones y lograr que una propuesta pase la revisión hasta el merge.",
         ],
     },
+    {
+        slug: "weftmap",
+        idx: "#07",
+        name: "Weftmap — Grafos de llamadas de código",
+        tags: ["TypeScript", "Next.js", "Tree-sitter", "React Flow", "Open Source"],
+        desc: "Herramienta web open source: pegas código y obtienes un grafo de llamadas interactivo que muestra qué función llama a cuál. Multi-lenguaje (Python, JS/TS y Go) gracias a Tree-sitter.",
+        year: "2026",
+        role: "Full-stack · Open source",
+        demo: "https://weftmap.vercel.app",
+        repo: "https://github.com/DataDave-Dev/weftmap",
+        tagline:
+            "Pega un fragmento de código y obtén un grafo interactivo de qué función llama a cuál. Multi-lenguaje y open source.",
+        overview: [
+            "Entender código ajeno cuesta: hay que leer función por función para reconstruir mentalmente qué llama a qué. Quería una herramienta que convirtiera ese mapa mental en un diagrama navegable, sin instalar nada.",
+            "Weftmap es una app Next.js donde pegas el código, eliges el lenguaje y el backend lo parsea con Tree-sitter (WASM) para construir un grafo de llamadas que el frontend dibuja con React Flow. Lo diferencial es la arquitectura multi-lenguaje: añadir uno nuevo es solo un LangSpec y dos queries de Tree-sitter.",
+        ],
+        highlights: [
+            {
+                title: "Grafo de llamadas interactivo",
+                desc: "Funciones como nodos, llamadas como flechas. Pan, zoom y arrastre con React Flow y layout jerárquico con dagre.",
+            },
+            {
+                title: "Arquitectura multi-lenguaje y enchufable",
+                desc: "Un solo motor de parseo (Tree-sitter) para Python, JS/TS y Go. Sumar un lenguaje son unas pocas líneas, no un parser nuevo.",
+            },
+            {
+                title: "Queries declarativas, no AST a mano",
+                desc: "El grafo se extrae con queries de Tree-sitter (una para definiciones, otra para llamadas) en vez de recorrer el árbol a mano: menos código y más fácil de mantener.",
+            },
+            {
+                title: "Sin paso de build para el usuario",
+                desc: "Se pega el snippet y se pulsa Analizar; las llamadas a librerías y builtins se filtran para que el grafo mantenga solo lo relevante.",
+            },
+        ],
+        stack: [
+            {
+                name: "Next.js + TypeScript",
+                why: "Frontend y backend (App Router) en un mismo proyecto y un solo deploy, con tipos en toda la pila.",
+            },
+            {
+                name: "Tree-sitter (WASM)",
+                why: "El motor de parseo: una sola API para ~40 lenguajes vía web-tree-sitter.",
+            },
+            {
+                name: "React Flow + dagre",
+                why: "El render del grafo: nodos interactivos con layout jerárquico automático.",
+            },
+            {
+                name: "Vitest",
+                why: "Pruebas unitarias rápidas de los analizadores por lenguaje.",
+            },
+        ],
+        challenges: [
+            "Diseñar una abstracción de lenguaje (LangSpec + queries) que sirva igual a Python, JS/TS y Go sin código a medida por cada uno.",
+            "Filtrar el ruido: distinguir las llamadas entre funciones propias de las llamadas a builtins y librerías para que el grafo siga siendo legible.",
+        ],
+    },
 ];
 
 const PROJECTS_EN: Project[] = [
@@ -767,6 +824,63 @@ const PROJECTS_EN: Project[] = [
         ],
         challenges: [
             "Contributing to a massive open-source project: understanding an unfamiliar codebase, following its conventions and getting a proposal through review all the way to merge.",
+        ],
+    },
+    {
+        slug: "weftmap",
+        idx: "#07",
+        name: "Weftmap — Code Call Graphs",
+        tags: ["TypeScript", "Next.js", "Tree-sitter", "React Flow", "Open Source"],
+        desc: "Open-source web tool: paste code and get an interactive call graph showing which function calls which. Multi-language (Python, JS/TS and Go) powered by Tree-sitter.",
+        year: "2026",
+        role: "Full-stack · Open source",
+        demo: "https://weftmap.vercel.app",
+        repo: "https://github.com/DataDave-Dev/weftmap",
+        tagline:
+            "Paste a snippet of code and get an interactive graph of which function calls which. Multi-language and open source.",
+        overview: [
+            "Understanding someone else's code is costly: you read function by function to rebuild a mental map of what calls what. I wanted a tool that turned that mental map into a navigable diagram, with nothing to install.",
+            "Weftmap is a Next.js app where you paste the code, pick the language, and the backend parses it with Tree-sitter (WASM) to build a call graph that the frontend draws with React Flow. The differentiator is the multi-language architecture: adding a new language is just a LangSpec and two Tree-sitter queries.",
+        ],
+        highlights: [
+            {
+                title: "Interactive call graph",
+                desc: "Functions as nodes, calls as arrows. Pan, zoom and drag with React Flow and a hierarchical layout via dagre.",
+            },
+            {
+                title: "Pluggable multi-language architecture",
+                desc: "A single parsing engine (Tree-sitter) for Python, JS/TS and Go. Adding a language is a few lines, not a brand-new parser.",
+            },
+            {
+                title: "Declarative queries, not hand-walked AST",
+                desc: "The graph is extracted with Tree-sitter queries (one for definitions, one for calls) instead of walking the tree by hand: less code, easier to maintain.",
+            },
+            {
+                title: "No build step for the user",
+                desc: "Paste the snippet and hit Analyze; calls to libraries and builtins are filtered out so the graph keeps only what matters.",
+            },
+        ],
+        stack: [
+            {
+                name: "Next.js + TypeScript",
+                why: "Frontend and backend (App Router) in one project and one deploy, with types across the whole stack.",
+            },
+            {
+                name: "Tree-sitter (WASM)",
+                why: "The parsing engine: a single API for ~40 languages via web-tree-sitter.",
+            },
+            {
+                name: "React Flow + dagre",
+                why: "The graph rendering: interactive nodes with automatic hierarchical layout.",
+            },
+            {
+                name: "Vitest",
+                why: "Fast unit tests for the per-language analyzers.",
+            },
+        ],
+        challenges: [
+            "Designing a language abstraction (LangSpec + queries) that serves Python, JS/TS and Go equally without custom code per language.",
+            "Filtering the noise: telling calls between your own functions apart from calls to builtins and libraries so the graph stays readable.",
         ],
     },
 ];
