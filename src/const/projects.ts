@@ -364,29 +364,29 @@ const PROJECTS_ES: Project[] = [
         idx: "#06",
         name: "La Velada V — Contribución Open Source",
         tags: ["TypeScript", "Astro", "Open Source", "UI / Animación"],
-        desc: "Contribuyo al proyecto open source de la web oficial de La Velada V (de midudev): propongo mejoras de interfaz y animación, y una de ellas fue revisada y mergeada al proyecto.",
-        year: "2025",
+        desc: "Contribuyo al proyecto open source de la web oficial de La Velada V (de midudev): propongo mejoras de interfaz, animación, accesibilidad, rendimiento y seguridad, y más de 20 de mis pull requests han sido revisadas y mergeadas.",
+        year: "2025 — 2026",
         role: "Open source · Contribuidor",
         demo: "https://infolavelada.com",
-        repo: "https://github.com/midudev/la-velada-web-oficial/pull/1130",
+        repo: "https://github.com/midudev/la-velada-web-oficial/pulls?q=is%3Apr+author%3ADataDave-Dev+is%3Amerged",
         tagline:
             "Contribución a la web oficial de La Velada V, un proyecto open source masivo de la comunidad de midudev. Las aportaciones pasan por revisión; las que aportan, se integran.",
         overview: [
             "La web oficial de La Velada V es un proyecto open source de midudev al que contribuye mucha gente: cada quien propone mejoras por pull request y, si aportan y pasan la revisión, se integran.",
-            "Participo cuando tengo oportunidad, sobre todo en interfaz y micro-interacciones. Una de mis aportaciones —partículas de hover y una animación de selección de luchador al estilo Mario Kart— fue revisada y mergeada al proyecto.",
+            "Soy contribuidor recurrente: llevo más de 20 PRs mergeados que van desde rediseños de la ficha del boxeador y una experiencia de selección de luchador cinematográfica, hasta refresco de votos en vivo, arreglos de responsive en móvil, accesibilidad, rendimiento y cabeceras de seguridad HTTP.",
         ],
         highlights: [
             {
-                title: "Aportación mergeada",
-                desc: "Mi PR de partículas de hover y animación de selección estilo Mario Kart pasó la revisión del proyecto y quedó integrada en la web oficial.",
+                title: "Más de 20 PRs mergeados",
+                desc: "Contribuidor recurrente: desde rediseños de UI y animaciones hasta arreglos de datos, accesibilidad, rendimiento y seguridad, todos revisados e integrados en la web oficial.",
             },
             {
                 title: "Trabajo sobre código ajeno",
                 desc: "Contribuir a un proyecto grande implica leer y respetar su arquitectura y convenciones, no solo escribir código nuevo.",
             },
             {
-                title: "Foco en interacción y rendimiento",
-                desc: "Mis aportaciones se centran en micro-interacciones y animaciones que mejoran la experiencia sin penalizar el rendimiento.",
+                title: "Amplio espectro de aportaciones",
+                desc: "UI y micro-interacciones, pero también accesibilidad, rendimiento, corrección de datos y endurecimiento de seguridad: mejoras que cuidan la experiencia sin penalizar el rendimiento.",
             },
         ],
         stack: [
@@ -404,7 +404,7 @@ const PROJECTS_ES: Project[] = [
             },
         ],
         challenges: [
-            "Aportar a un proyecto open source masivo: entender una base de código ajena, seguir sus convenciones y lograr que una propuesta pase la revisión hasta el merge.",
+            "Aportar de forma sostenida a un proyecto open source masivo: entender una base de código ajena, seguir sus convenciones y lograr que decenas de propuestas pasen la revisión hasta el merge.",
         ],
     },
     {
@@ -783,29 +783,29 @@ const PROJECTS_EN: Project[] = [
         idx: "#06",
         name: "La Velada V — Open Source Contribution",
         tags: ["TypeScript", "Astro", "Open Source", "UI / Animation"],
-        desc: "I contribute to the open-source project behind the official La Velada V website (by midudev): I propose UI and animation improvements, and one of them was reviewed and merged into the project.",
-        year: "2025",
+        desc: "I contribute to the open-source project behind the official La Velada V website (by midudev): I propose UI, animation, accessibility, performance and security improvements, and more than 20 of my pull requests have been reviewed and merged.",
+        year: "2025 — 2026",
         role: "Open source · Contributor",
         demo: "https://infolavelada.com",
-        repo: "https://github.com/midudev/la-velada-web-oficial/pull/1130",
+        repo: "https://github.com/midudev/la-velada-web-oficial/pulls?q=is%3Apr+author%3ADataDave-Dev+is%3Amerged",
         tagline:
             "A contribution to the official La Velada V website, a massive open-source project from midudev's community. Contributions go through review; the ones that add value get merged.",
         overview: [
             "The official La Velada V website is an open-source project by midudev with many contributors: everyone proposes improvements via pull request and, if they add value and pass review, they get merged.",
-            "I take part when I get the chance, mostly on UI and micro-interactions. One of my contributions —hover particles and a Mario Kart-style fighter-selection animation— was reviewed and merged into the project.",
+            "I'm a recurring contributor: 20+ merged PRs ranging from a boxer-profile redesign and a cinematic fighter-selection experience to live vote refresh, mobile responsive fixes, accessibility, performance and HTTP security headers.",
         ],
         highlights: [
             {
-                title: "Merged contribution",
-                desc: "My PR for hover particles and a Mario Kart-style selection animation passed the project's review and was merged into the official website.",
+                title: "20+ merged PRs",
+                desc: "Recurring contributor: from UI redesigns and animations to data fixes, accessibility, performance and security, all reviewed and merged into the official website.",
             },
             {
                 title: "Working on someone else's code",
                 desc: "Contributing to a large project means reading and respecting its architecture and conventions, not just writing new code.",
             },
             {
-                title: "Focus on interaction and performance",
-                desc: "My contributions center on micro-interactions and animations that improve the experience without hurting performance.",
+                title: "Broad range of contributions",
+                desc: "UI and micro-interactions, but also accessibility, performance, data fixes and security hardening: improvements that care for the experience without hurting performance.",
             },
         ],
         stack: [
@@ -823,7 +823,7 @@ const PROJECTS_EN: Project[] = [
             },
         ],
         challenges: [
-            "Contributing to a massive open-source project: understanding an unfamiliar codebase, following its conventions and getting a proposal through review all the way to merge.",
+            "Contributing consistently to a massive open-source project: understanding an unfamiliar codebase, following its conventions and getting dozens of proposals through review all the way to merge.",
         ],
     },
     {

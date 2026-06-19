@@ -60,15 +60,15 @@ const CAREER_CONTENT: Record<Lang, CareerContent> = {
         ],
         achievements: [
             {
-                title: "Contribución mergeada a La Velada V",
+                title: "Más de 20 contribuciones mergeadas a La Velada V",
                 org: "Proyecto open source de midudev",
                 start: "2025",
-                end: "2025",
+                end: "2026",
                 summary:
-                    "Una propuesta de interfaz y animación (partículas de hover y selección de luchador al estilo Mario Kart) pasó la revisión del proyecto y fue mergeada.",
+                    "Contribuidor recurrente con más de 20 PRs revisados y mergeados: rediseños de interfaz, animaciones, refresco de votos en vivo, accesibilidad, rendimiento y seguridad.",
                 link: {
-                    href: "https://github.com/midudev/la-velada-web-oficial/pull/1130",
-                    label: "Ver PR #1130 ↗",
+                    href: "https://github.com/midudev/la-velada-web-oficial/pulls?q=is%3Apr+author%3ADataDave-Dev+is%3Amerged",
+                    label: "Ver PRs mergeados ↗",
                 },
             },
         ],
@@ -109,15 +109,15 @@ const CAREER_CONTENT: Record<Lang, CareerContent> = {
         ],
         achievements: [
             {
-                title: "Merged contribution to La Velada V",
+                title: "20+ merged contributions to La Velada V",
                 org: "Open-source project by midudev",
                 start: "2025",
-                end: "2025",
+                end: "2026",
                 summary:
-                    "A UI and animation proposal (hover particles and a Mario Kart-style fighter selection) passed the project's review and was merged.",
+                    "Recurring contributor with 20+ reviewed and merged PRs: UI redesigns, animations, live vote refresh, accessibility, performance and security.",
                 link: {
-                    href: "https://github.com/midudev/la-velada-web-oficial/pull/1130",
-                    label: "View PR #1130 ↗",
+                    href: "https://github.com/midudev/la-velada-web-oficial/pulls?q=is%3Apr+author%3ADataDave-Dev+is%3Amerged",
+                    label: "View merged PRs ↗",
                 },
             },
         ],
